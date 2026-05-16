@@ -6,9 +6,15 @@
   "single_config_entry": true,
   "documentation": "https://github.com/efeshinkawa/halivekit",
   "issue_tracker": "https://github.com/efeshinkawa/halivekit/issues",
-  "codeowners": ["@efeshinkawa"],
-  "dependencies": ["webhook"],
-  "after_dependencies": ["http"],
+  "codeowners": [
+    "@efeshinkawa"
+  ],
+  "dependencies": [
+    "webhook"
+  ],
+  "after_dependencies": [
+    "http"
+  ],
   "requirements": [],
   "iot_class": "local_push",
   "integration_type": "service"
