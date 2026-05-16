@@ -1,0 +1,411 @@
+start_activity:
+  name: Start Live Activity
+  description: Broadcast a request for the HA LiveKit iOS app to start a Live Activity while it is open, and optionally forward it to the APNs relay.
+  fields:
+    activity_id:
+      name: Activity ID
+      description: Stable ID for this Live Activity, e.g. front_door or washing_machine.
+      required: true
+      example: front_door
+      selector:
+        text:
+    entity_id:
+      name: Entity
+      description: Optional but recommended Home Assistant entity that should keep updating this activity.
+      required: false
+      example: binary_sensor.front_door
+      selector:
+        entity:
+    title:
+      name: Title
+      description: Live Activity heading, e.g. Door Alert or Laundry.
+      required: false
+      example: Door Alert
+      selector:
+        text:
+    display_name:
+      name: Display name
+      description: Friendly label for the entity shown in the Live Activity.
+      required: false
+      example: Front Door
+      selector:
+        text:
+    subtitle:
+      name: Subtitle
+      description: Short status line, e.g. Opened or Running.
+      required: false
+      example: Opened
+      selector:
+        text:
+    template:
+      name: Template
+      description: Visual template hint for the iOS app.
+      required: false
+      default: custom
+      selector:
+        select:
+          options:
+            - custom
+            - door
+            - laundry
+            - washing_machine
+            - dishwasher
+            - vacuum
+            - security
+            - climate
+            - energy
+            - timer
+    state:
+      name: State
+      description: Optional initial state text to show immediately.
+      required: false
+      example: Open
+      selector:
+        text:
+    progress:
+      name: Progress
+      description: Optional progress value from 0.0 to 1.0.
+      required: false
+      example: 0.42
+      selector:
+        number:
+          min: 0
+          max: 1
+          step: 0.01
+          mode: slider
+    data:
+      name: Extra data
+      description: Advanced optional data such as icon_name, display_style, theme, secondary_state or unit.
+      required: false
+      selector:
+        object:
+    device_id:
+      name: Device ID
+      description: Optional advanced routing field. Leave empty to broadcast to any connected HA LiveKit iOS app.
+      required: false
+      advanced: true
+      selector:
+        text:
+
+start_entity_activity:
+  name: Start Entity Live Activity
+  description: Start a Live Activity from a Home Assistant entity. HA LiveKit reads the entity state, friendly name, unit and supported attributes automatically.
+  fields:
+    activity_id:
+      name: Activity ID
+      description: Optional stable ID for this Live Activity. Leave empty to use the entity object ID, e.g. binary_sensor.front_door becomes front_door.
+      required: false
+      example: front_door
+      selector:
+        text:
+    entity_id:
+      name: Entity
+      description: Home Assistant entity used to build the Live Activity state.
+      required: true
+      example: binary_sensor.front_door
+      selector:
+        entity:
+    template:
+      name: Template
+      description: Optional visual template hint. Leave empty to infer from the entity domain and device class.
+      required: false
+      selector:
+        select:
+          options:
+            - custom
+            - door
+            - laundry
+            - washing_machine
+            - dishwasher
+            - vacuum
+            - security
+            - climate
+            - energy
+            - timer
+    display_name:
+      name: Display name
+      description: Optional label override. Defaults to the entity friendly name.
+      required: false
+      example: Front Door
+      selector:
+        text:
+    title:
+      name: Title
+      description: Optional title override. Defaults to the entity friendly name.
+      required: false
+      example: Door Security
+      selector:
+        text:
+    subtitle:
+      name: Subtitle
+      description: Optional subtitle override. Defaults to a short sentence from the entity state.
+      required: false
+      example: Front Door is open
+      selector:
+        text:
+    progress_entity_id:
+      name: Progress entity
+      description: Optional entity whose numeric state should be used as progress. Percent values are converted to 0.0-1.0 automatically.
+      required: false
+      example: sensor.washing_machine_progress
+      selector:
+        entity:
+    progress:
+      name: Progress override
+      description: Optional explicit progress value from 0.0 to 1.0.
+      required: false
+      advanced: true
+      selector:
+        number:
+          min: 0
+          max: 1
+          step: 0.01
+          mode: slider
+    end_when:
+      name: End when
+      description: Optional advanced metadata for future auto-end rules. HA LiveKit includes it in the payload but does not end activities automatically from this field.
+      required: false
+      advanced: true
+      selector:
+        object:
+    device_id:
+      name: Device ID
+      description: Optional advanced routing field. Leave empty to broadcast to any connected HA LiveKit iOS app.
+      required: false
+      advanced: true
+      selector:
+        text:
+
+update_activity:
+  name: Update Live Activity
+  description: Broadcast a request for the HA LiveKit iOS app to update an existing Live Activity, and optionally forward it to the APNs relay.
+  fields:
+    activity_id:
+      name: Activity ID
+      description: Stable ID for the Live Activity to update, e.g. front_door or washing_machine.
+      required: true
+      example: washing_machine
+      selector:
+        text:
+    entity_id:
+      name: Entity
+      description: Optional Home Assistant entity associated with this update.
+      required: false
+      example: sensor.washing_machine_status
+      selector:
+        entity:
+    title:
+      name: Title
+      description: Optional replacement heading.
+      required: false
+      selector:
+        text:
+    display_name:
+      name: Display name
+      description: Optional replacement friendly entity label.
+      required: false
+      selector:
+        text:
+    subtitle:
+      name: Subtitle
+      description: Short status line, e.g. Door closed or 12 min remaining.
+      required: false
+      example: 12 min remaining
+      selector:
+        text:
+    template:
+      name: Template
+      description: Optional visual template hint.
+      required: false
+      selector:
+        select:
+          options:
+            - custom
+            - door
+            - laundry
+            - washing_machine
+            - dishwasher
+            - vacuum
+            - security
+            - climate
+            - energy
+            - timer
+    state:
+      name: State
+      description: Primary state text shown in the Live Activity.
+      required: false
+      example: Running
+      selector:
+        text:
+    progress:
+      name: Progress
+      description: Progress value from 0.0 to 1.0.
+      required: false
+      example: 0.42
+      selector:
+        number:
+          min: 0
+          max: 1
+          step: 0.01
+          mode: slider
+    data:
+      name: Extra data
+      description: Advanced optional data such as icon_name, display_style, theme, secondary_state or unit.
+      required: false
+      selector:
+        object:
+    device_id:
+      name: Device ID
+      description: Optional advanced routing field. Leave empty to broadcast to any connected HA LiveKit iOS app.
+      required: false
+      advanced: true
+      selector:
+        text:
+
+update_entity_activity:
+  name: Update Entity Live Activity
+  description: Update an existing Live Activity from the current Home Assistant entity state using the same entity-based mapping as start_entity_activity.
+  fields:
+    activity_id:
+      name: Activity ID
+      description: Optional stable ID for the Live Activity to update. Leave empty to use the entity object ID, e.g. binary_sensor.front_door becomes front_door.
+      required: false
+      example: front_door
+      selector:
+        text:
+    entity_id:
+      name: Entity
+      description: Home Assistant entity used to rebuild the Live Activity state.
+      required: true
+      example: binary_sensor.front_door
+      selector:
+        entity:
+    template:
+      name: Template
+      description: Optional visual template hint. Leave empty to infer from the entity domain and device class.
+      required: false
+      selector:
+        select:
+          options:
+            - custom
+            - door
+            - laundry
+            - washing_machine
+            - dishwasher
+            - vacuum
+            - security
+            - climate
+            - energy
+            - timer
+    display_name:
+      name: Display name
+      description: Optional label override. Defaults to the entity friendly name.
+      required: false
+      example: Front Door
+      selector:
+        text:
+    title:
+      name: Title
+      description: Optional title override. Defaults to the entity friendly name.
+      required: false
+      example: Door Security
+      selector:
+        text:
+    subtitle:
+      name: Subtitle
+      description: Optional subtitle override. Defaults to a short sentence from the entity state.
+      required: false
+      example: Front Door is closed
+      selector:
+        text:
+    progress_entity_id:
+      name: Progress entity
+      description: Optional entity whose numeric state should be used as progress. Percent values are converted to 0.0-1.0 automatically.
+      required: false
+      example: sensor.washing_machine_progress
+      selector:
+        entity:
+    progress:
+      name: Progress override
+      description: Optional explicit progress value from 0.0 to 1.0.
+      required: false
+      advanced: true
+      selector:
+        number:
+          min: 0
+          max: 1
+          step: 0.01
+          mode: slider
+    end_when:
+      name: End when
+      description: Optional advanced metadata for future auto-end rules. HA LiveKit includes it in the payload but does not end activities automatically from this field.
+      required: false
+      advanced: true
+      selector:
+        object:
+    device_id:
+      name: Device ID
+      description: Optional advanced routing field. Leave empty to broadcast to any connected HA LiveKit iOS app.
+      required: false
+      advanced: true
+      selector:
+        text:
+
+end_activity:
+  name: End Live Activity
+  description: Broadcast a request for the HA LiveKit iOS app to end an existing Live Activity, and optionally forward it to the APNs relay.
+  fields:
+    activity_id:
+      name: Activity ID
+      description: Stable ID for the Live Activity to end, e.g. front_door or washing_machine.
+      required: true
+      example: washing_machine
+      selector:
+        text:
+    reason:
+      name: Reason
+      description: Optional reason for diagnostics, e.g. finished or dismissed.
+      required: false
+      default: ended
+      example: finished
+      selector:
+        text:
+    device_id:
+      name: Device ID
+      description: Optional advanced routing field. Leave empty to broadcast to any connected HA LiveKit iOS app.
+      required: false
+      advanced: true
+      selector:
+        text:
+
+configure_managed_relay:
+  name: Configure Managed Relay
+  description: Internal service used by the HA LiveKit iOS app to store the managed relay credential for this Home Assistant instance.
+  fields:
+    relay_url:
+      name: Managed relay URL
+      description: Managed relay base URL provided by the HA LiveKit app.
+      required: true
+      advanced: true
+      selector:
+        text:
+          type: url
+    relay_shared_secret:
+      name: Managed relay credential
+      description: Per-instance relay credential provided by the HA LiveKit app.
+      required: true
+      advanced: true
+      selector:
+        text:
+          type: password
+    relay_environment:
+      name: Relay environment
+      description: APNs environment for this app build.
+      required: false
+      default: sandbox
+      advanced: true
+      selector:
+        select:
+          options:
+            - sandbox
+            - production

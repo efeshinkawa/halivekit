@@ -1,0 +1,29 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local Home Assistant/dev state
+.storage/
+deps/
+home-assistant.log*
+
+# Secrets and private app/relay material
+.env
+.env.*
+.dev.vars
+.dev.vars.*
+*.token
+*.secret
+*.p8
+AuthKey_*.p8
+LocalSecrets.xcconfig
+
+# Keep this HACS repository integration-only
+ios/
+relay/
+scripts/
+*.xcarchive
+*.ipa
+*.dSYM
+*.dSYM.zip

@@ -1,0 +1,34 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "HA LiveKit",
+        "description": "Foreground updates work through the Home Assistant event stream. Background Live Activities use the relay configured for this build or an advanced custom relay. No extra code is required. Webhook path: {webhook_path}.",
+        "data": {
+          "relay_enabled": "Background Live Activities",
+          "relay_mode": "Relay mode",
+          "relay_url": "Custom relay URL",
+          "relay_shared_secret": "Custom relay shared secret",
+          "relay_environment": "Relay environment"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "HA LiveKit is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "HA LiveKit options",
+        "data": {
+          "relay_enabled": "Background Live Activities",
+          "relay_mode": "Relay mode",
+          "relay_url": "Custom relay URL",
+          "relay_shared_secret": "Custom relay shared secret",
+          "relay_environment": "Relay environment"
+        }
+      }
+    }
+  }
+}
