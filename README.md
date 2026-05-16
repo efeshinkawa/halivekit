@@ -19,7 +19,7 @@ Use Home Assistant services to create Live Activities for doors, laundry, lights
 
 - Home Assistant.
 - HACS.
-- The HA LiveKit iOS app or TestFlight beta.
+- The HA LiveKit iOS app or TestFlight beta (https://testflight.apple.com/join/MXPvm4Wk):.
 - An iPhone that supports Live Activities.
 
 ## Installation with HACS
