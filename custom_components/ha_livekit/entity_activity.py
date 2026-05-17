@@ -14,6 +14,7 @@ from .const import (
     ATTR_DISPLAY_NAME,
     ATTR_END_WHEN,
     ATTR_ENTITY_ID,
+    ATTR_ICON_NAME,
     ATTR_PROGRESS,
     ATTR_PROGRESS_ENTITY_ID,
     ATTR_STATE,
@@ -70,7 +71,14 @@ def build_entity_activity_payload(
             else _progress_from_state(entity_state)
         )
 
-    data = _entity_data(entity_state, template, state_text, progress_state, source_service)
+    data = _entity_data(
+        entity_state,
+        template,
+        state_text,
+        progress_state,
+        source_service,
+        icon_override=_clean_string(payload.get(ATTR_ICON_NAME)),
+    )
     if progress_entity_id:
         data["progress_entity_id"] = progress_entity_id
     if progress_state is not None:
@@ -115,6 +123,7 @@ def _entity_data(
     state_text: str,
     progress_state: State | None,
     source_service: str,
+    icon_override: str | None = None,
 ) -> dict[str, Any]:
     attrs = state.attributes
     domain = _domain(state.entity_id)
@@ -130,7 +139,7 @@ def _entity_data(
         "raw_state": state.state,
         "value": state.state,
         "display_state": state_text,
-        "icon_name": _icon_name(state, template),
+        "icon_name": icon_override or _icon_name(state, template),
         "display_style": _display_style(template),
         "theme": "homeAssistant",
         "attributes": _attributes_summary(state),
@@ -141,6 +150,8 @@ def _entity_data(
         data["unit_of_measurement"] = unit
     if device_class := _device_class(state):
         data["device_class"] = device_class
+    if ha_icon := _clean_string(attrs.get("icon")):
+        data["home_assistant_icon"] = ha_icon
     if secondary := _secondary_state(state, template, progress_state):
         data["secondary_state"] = secondary
 
@@ -373,6 +384,8 @@ def _icon_name(state: State, template: str) -> str:
     normalized_state = str(state.state).casefold()
     device_class = _device_class(state)
     normalized_template = _normalize(template)
+    if mapped_icon := _sf_symbol_from_home_assistant_icon(state.attributes.get("icon")):
+        return mapped_icon
 
     if normalized_template in {"laundry", "washing_machine", "washingmachine"}:
         return "washer.fill"
@@ -393,6 +406,37 @@ def _icon_name(state: State, template: str) -> str:
     if domain == "sensor" and _unit(state) == "%":
         return "percent"
     return "dot.radiowaves.left.and.right"
+
+
+def _sf_symbol_from_home_assistant_icon(icon: Any) -> str | None:
+    value = _clean_string(icon)
+    if not value:
+        return None
+
+    normalized = value.removeprefix("mdi:").replace("-", "_").casefold()
+    mapping = {
+        "lightbulb": "lightbulb.fill",
+        "lightbulb_on": "lightbulb.fill",
+        "power_plug": "powerplug.fill",
+        "power_socket": "powerplug.fill",
+        "door": "door.left.hand.closed",
+        "door_open": "door.left.hand.open",
+        "window_closed": "window.vertical.closed",
+        "window_open": "window.vertical.open",
+        "washing_machine": "washer.fill",
+        "dishwasher": "dishwasher.fill",
+        "robot_vacuum": "sparkles",
+        "vacuum": "sparkles",
+        "thermometer": "thermometer.medium",
+        "lightning_bolt": "bolt.fill",
+        "flash": "bolt.fill",
+        "battery": "battery.75percent",
+        "lock": "lock.fill",
+        "lock_open": "lock.open.fill",
+        "garage": "door.garage.closed",
+        "garage_open": "door.garage.open",
+    }
+    return mapping.get(normalized)
 
 
 def _progress_from_state(state: State | None, allow_unitless_state: bool = False) -> float | None:

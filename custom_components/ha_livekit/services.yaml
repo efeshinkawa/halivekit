@@ -129,6 +129,13 @@ start_entity_activity:
       example: Front Door
       selector:
         text:
+    icon_name:
+      name: Icon
+      description: Optional SF Symbol override, e.g. lightbulb.fill or door.left.hand.open. Entity pictures are not fetched by the relay.
+      required: false
+      advanced: true
+      selector:
+        text:
     title:
       name: Title
       description: Optional title override. Defaults to the entity friendly name.
@@ -304,6 +311,13 @@ update_entity_activity:
       example: Front Door
       selector:
         text:
+    icon_name:
+      name: Icon
+      description: Optional SF Symbol override, e.g. lightbulb.fill or door.left.hand.open. Entity pictures are not fetched by the relay.
+      required: false
+      advanced: true
+      selector:
+        text:
     title:
       name: Title
       description: Optional title override. Defaults to the entity friendly name.
@@ -409,3 +423,10 @@ configure_managed_relay:
           options:
             - sandbox
             - production
+    home_assistant_instance_id:
+      name: Home Assistant instance ID
+      description: Internal per-home relay isolation identifier provided by the HA LiveKit iOS app.
+      required: true
+      advanced: true
+      selector:
+        text:

@@ -23,6 +23,7 @@ from .const import (
     ATTR_DISPLAY_NAME,
     ATTR_END_WHEN,
     ATTR_ENTITY_ID,
+    ATTR_ICON_NAME,
     ATTR_PROGRESS,
     ATTR_PROGRESS_ENTITY_ID,
     ATTR_REASON,
@@ -35,6 +36,7 @@ from .const import (
     CONF_RELAY_MODE,
     CONF_RELAY_SHARED_SECRET,
     CONF_RELAY_URL,
+    CONF_HOME_ASSISTANT_INSTANCE_ID,
     DOMAIN,
     PLATFORMS,
     RELAY_ENVIRONMENT_PRODUCTION,
@@ -104,6 +106,7 @@ ENTITY_ACTIVITY_SCHEMA = vol.Schema(
         vol.Optional(ATTR_SUBTITLE): cv.string,
         vol.Optional(ATTR_PROGRESS_ENTITY_ID): cv.entity_id,
         vol.Optional(ATTR_PROGRESS): vol.Coerce(float),
+        vol.Optional(ATTR_ICON_NAME): cv.string,
         vol.Optional(ATTR_END_WHEN): vol.Any(cv.string, dict),
     }
 )
@@ -115,6 +118,7 @@ CONFIGURE_MANAGED_RELAY_SCHEMA = vol.Schema(
         vol.Optional(CONF_RELAY_ENVIRONMENT, default=RELAY_ENVIRONMENT_SANDBOX): vol.In(
             [RELAY_ENVIRONMENT_SANDBOX, RELAY_ENVIRONMENT_PRODUCTION]
         ),
+        vol.Required(CONF_HOME_ASSISTANT_INSTANCE_ID): cv.string,
     }
 )
 
@@ -229,12 +233,15 @@ async def _handle_configure_managed_relay(
     coordinator = _get_coordinator(hass)
     relay_url = payload[CONF_RELAY_URL].strip()
     relay_secret = payload[CONF_RELAY_SHARED_SECRET].strip()
+    home_assistant_instance_id = payload[CONF_HOME_ASSISTANT_INSTANCE_ID].strip()
 
     parsed = urlsplit(relay_url)
     if parsed.scheme not in {"http", "https"} or not parsed.netloc:
         raise HomeAssistantError("Invalid managed relay URL")
     if not relay_secret:
         raise HomeAssistantError("Managed relay secret is required")
+    if not _valid_home_assistant_instance_id(home_assistant_instance_id):
+        raise HomeAssistantError("Managed relay Home Assistant instance ID is invalid")
 
     entry = coordinator.config_entry
     options = {
@@ -244,6 +251,7 @@ async def _handle_configure_managed_relay(
         CONF_RELAY_URL: relay_url,
         CONF_RELAY_SHARED_SECRET: relay_secret,
         CONF_RELAY_ENVIRONMENT: payload.get(CONF_RELAY_ENVIRONMENT, RELAY_ENVIRONMENT_SANDBOX),
+        CONF_HOME_ASSISTANT_INSTANCE_ID: home_assistant_instance_id,
     }
     hass.config_entries.async_update_entry(entry, options=options)
     coordinator.async_update_listeners()
@@ -262,3 +270,10 @@ def _get_coordinator(hass: HomeAssistant) -> HALiveKitCoordinator:
             return coordinator
 
     raise HomeAssistantError("HA LiveKit is not configured")
+
+
+def _valid_home_assistant_instance_id(value: str) -> bool:
+    """Return whether an iOS-provisioned HA instance id is safe to use."""
+    return bool(value) and value.startswith("ha_") and len(value) == 35 and all(
+        character in "0123456789abcdef" for character in value[3:]
+    )

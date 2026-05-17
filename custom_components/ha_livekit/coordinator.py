@@ -10,7 +10,6 @@ import json
 import logging
 import re
 from typing import Any
-from urllib.parse import urlsplit
 
 from aiohttp import ClientTimeout
 
@@ -24,7 +23,9 @@ from .const import (
     ACTION_START,
     ACTION_UPDATE,
     CONF_PUSH_ENDPOINT_URL,
+    CONF_HOME_ASSISTANT_INSTANCE_ID,
     CONF_RELAY_ENABLED,
+    CONF_RELAY_ENVIRONMENT,
     CONF_RELAY_MODE,
     CONF_RELAY_SHARED_SECRET,
     CONF_RELAY_URL,
@@ -35,6 +36,8 @@ from .const import (
     HEADER_SIGNATURE,
     MANAGED_RELAY_SHARED_SECRET,
     MANAGED_RELAY_URL,
+    RELAY_ENVIRONMENT_PRODUCTION,
+    RELAY_ENVIRONMENT_SANDBOX,
     RELAY_MODE_CUSTOM,
     RELAY_MODE_MANAGED,
 )
@@ -138,9 +141,22 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
         )
 
     @property
+    def relay_environment(self) -> str:
+        """Return the APNs environment configured by the iOS app."""
+        value = self.config_entry.options.get(
+            CONF_RELAY_ENVIRONMENT,
+            self.config_entry.data.get(CONF_RELAY_ENVIRONMENT, RELAY_ENVIRONMENT_SANDBOX),
+        )
+        return value if value in {RELAY_ENVIRONMENT_SANDBOX, RELAY_ENVIRONMENT_PRODUCTION} else RELAY_ENVIRONMENT_SANDBOX
+
+    @property
     def home_assistant_instance_id(self) -> str:
-        """Return the automatic HA instance identifier shared with the iOS app."""
-        return home_assistant_instance_id(self.hass)
+        """Return the iOS-provisioned HA instance identifier for relay isolation."""
+        value = self.config_entry.options.get(
+            CONF_HOME_ASSISTANT_INSTANCE_ID,
+            self.config_entry.data.get(CONF_HOME_ASSISTANT_INSTANCE_ID, ""),
+        )
+        return value if _valid_home_assistant_instance_id(value) else ""
 
     async def async_send_activity(
         self,
@@ -263,6 +279,12 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
                 "HA LiveKit managed relay secret missing; attempting POST so relay diagnostics are visible"
             )
 
+        instance_id = self.home_assistant_instance_id
+        if not instance_id:
+            self.last_relay_error = "Managed relay Home Assistant instance ID missing; reopen the iOS app to reconfigure"
+            _LOGGER.warning("HA LiveKit APNs relay skipped: %s", self.last_relay_error)
+            return False
+
         if action not in {ACTION_START, ACTION_UPDATE, ACTION_END}:
             self.last_relay_error = f"unsupported action {action}"
             _LOGGER.warning("HA LiveKit APNs relay skipped unsupported action %s", action)
@@ -270,7 +292,8 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
 
         session = async_get_clientsession(self.hass)
         relay_message = dict(message)
-        relay_message["home_assistant_instance_id"] = self.home_assistant_instance_id
+        relay_message["home_assistant_instance_id"] = instance_id
+        relay_message["apns_mode"] = self.relay_environment
         if self.hass.config.location_name:
             relay_message["home_assistant_name"] = self.hass.config.location_name
         body = json.dumps(relay_message, separators=(",", ":"), sort_keys=True).encode()
@@ -279,12 +302,14 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
             headers[HEADER_SECRET] = relay_secret
         url = f"{relay_url.rstrip('/')}/{action}"
         _LOGGER.warning(
-            "HA LiveKit relay POST attempt: enabled=%s url_present=%s endpoint=%s activity_id=%s secret_present=%s",
+            "HA LiveKit relay POST attempt: enabled=%s url_present=%s endpoint=%s activity_id=%s secret_present=%s environment=%s instance_id_prefix=%s",
             self.relay_enabled,
             bool(relay_url),
-            url,
+            action,
             message.get("activity_id"),
             bool(relay_secret),
+            self.relay_environment,
+            _log_instance_id(instance_id),
         )
 
         try:
@@ -301,20 +326,20 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
                     self.last_relay_error = f"HTTP {response.status}: {self.last_relay_response}"
                     _LOGGER.warning(
                         "HA LiveKit relay POST status: endpoint=%s status=%s response=%s",
-                        url,
+                        action,
                         response.status,
                         self.last_relay_response,
                     )
                     return False
                 _LOGGER.warning(
                     "HA LiveKit relay POST status: endpoint=%s status=%s response=%s",
-                    url,
+                    action,
                     response.status,
                     self.last_relay_response,
                 )
         except Exception as err:  # noqa: BLE001 - relay failure must not break V1 service flow.
             self.last_relay_error = str(err)
-            _LOGGER.exception("HA LiveKit relay POST exception: endpoint=%s error=%s", url, err)
+            _LOGGER.exception("HA LiveKit relay POST exception: endpoint=%s error=%s", action, err)
             return False
 
         return True
@@ -326,39 +351,21 @@ def _safe_response_summary(text: str) -> str:
         return "empty response"
 
     redacted = re.sub(r"\b[a-fA-F0-9]{64,}\b", "<redacted>", text)
+    redacted = re.sub(
+        r'(?i)("?(?:relay_shared_secret|home_assistant_relay_token|home_assistant_relay_secret|token|secret)"?\s*:\s*"?)[^",}\s]+',
+        r"\1<redacted>",
+        redacted,
+    )
     return redacted[:700]
 
 
-def home_assistant_instance_id(hass: HomeAssistant) -> str:
-    """Build the same token-free HA instance identifier that the iOS app derives."""
-    values = [
-        _normalized_component("location", getattr(hass.config, "location_name", None)),
-        _normalized_component("external", getattr(hass.config, "external_url", None)),
-        _normalized_component("internal", getattr(hass.config, "internal_url", None)),
-        _normalized_component("timezone", getattr(hass.config, "time_zone", None)),
-    ]
-    source = "|".join(value for value in values if value) or "home_assistant"
-    return f"ha_{hashlib.sha256(source.encode()).hexdigest()[:32]}"
+def _valid_home_assistant_instance_id(value: Any) -> bool:
+    """Return whether a Home Assistant instance id can be used for relay routing."""
+    if not isinstance(value, str):
+        return False
+    return bool(re.fullmatch(r"ha_[a-f0-9]{32}", value.strip()))
 
 
-def _normalized_component(prefix: str, value: Any) -> str | None:
-    if value is None:
-        return None
-
-    trimmed = str(value).strip()
-    if not trimmed:
-        return None
-
-    return f"{prefix}:{_normalized_url_string(trimmed) or trimmed.casefold()}"
-
-
-def _normalized_url_string(value: str) -> str | None:
-    parsed = urlsplit(value)
-    if parsed.scheme not in {"http", "https"} or not parsed.hostname:
-        return None
-
-    host = parsed.hostname.casefold()
-    if parsed.port:
-        host = f"{host}:{parsed.port}"
-    path = parsed.path.strip("/")
-    return f"{parsed.scheme.casefold()}://{host}{f'/{path}' if path else ''}"
+def _log_instance_id(value: str) -> str:
+    """Return a non-sensitive prefix for relay diagnostics."""
+    return f"{value[:11]}..." if value else "missing"

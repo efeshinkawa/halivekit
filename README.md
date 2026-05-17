@@ -313,6 +313,8 @@ Keep these private:
 
 HA LiveKit diagnostics are designed to avoid exposing full tokens or secrets, but you should still review logs before sharing them publicly.
 
+The iOS app configures relay details for background delivery, including a per-home instance ID and per-instance relay credential. Reopen the iOS app after updating so the integration receives the new scoped relay identity.
+
 ## Maintainers
 
 The iOS app can support background delivery through a managed APNs relay. Most users do not need to configure relay settings manually.
