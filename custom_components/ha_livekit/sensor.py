@@ -58,7 +58,7 @@ class HALiveKitLastEventSensor(CoordinatorEntity[HALiveKitCoordinator], SensorEn
             "entity_id": data.get("entity_id"),
             "relay_enabled": self.coordinator.relay_enabled,
             "relay_mode": self.coordinator.relay_mode,
-            "home_assistant_instance_id": self.coordinator.home_assistant_instance_id,
+            "home_assistant_instance_id": _redact_instance_id(self.coordinator.home_assistant_instance_id),
             "relay_url_configured": bool(self.coordinator.relay_url),
             "relay_shared_secret_configured": bool(self.coordinator.relay_shared_secret),
             "last_relay_attempt_at": self.coordinator.last_relay_attempt_at,
@@ -70,3 +70,12 @@ class HALiveKitLastEventSensor(CoordinatorEntity[HALiveKitCoordinator], SensorEn
             and self.coordinator.last_relay_status_code is not None
             and self.coordinator.last_relay_status_code < 400,
         }
+
+
+def _redact_instance_id(value: str) -> str:
+    """Return a diagnostics-safe Home Assistant instance identifier."""
+    if not value:
+        return ""
+    if len(value) <= 14:
+        return "<redacted-instance>"
+    return f"{value[:9]}...{value[-5:]}"

@@ -394,7 +394,7 @@ end_activity:
 
 configure_managed_relay:
   name: Configure Managed Relay
-  description: Internal service used by the HA LiveKit iOS app to store the managed relay credential for this Home Assistant instance.
+  description: Admin-only internal service used by the HA LiveKit iOS app to provision the managed relay credential for this Home Assistant instance.
   fields:
     relay_url:
       name: Managed relay URL
@@ -406,8 +406,16 @@ configure_managed_relay:
           type: url
     relay_shared_secret:
       name: Managed relay credential
-      description: Per-instance relay credential provided by the HA LiveKit app.
-      required: true
+      description: Legacy per-instance relay credential. New managed relay setup generates this inside Home Assistant instead.
+      required: false
+      advanced: true
+      selector:
+        text:
+          type: password
+    relay_app_registration_secret:
+      name: Managed relay app registration credential
+      description: App registration credential used by Home Assistant to provision the HA-owned relay credential.
+      required: false
       advanced: true
       selector:
         text:
