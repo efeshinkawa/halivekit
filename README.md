@@ -48,17 +48,15 @@ Keep your Long-Lived Access Token private. Do not paste it into automations, Git
 
 ## Automations
 
-Most users should use:
+Most users should use `ha_livekit.set_activity`.
 
-```yaml
-action: ha_livekit.set_activity
-data:
-  activity_id: front_door
-  entity_id: binary_sensor.front_door
-  template: door
-```
+- It starts the Live Activity if it does not exist.
+- It updates the existing Live Activity if it already exists.
+- This helps prevent duplicate Live Activities with the same `activity_id`.
 
-`set_activity` starts the Live Activity if it does not exist. If the same `activity_id` is already active, it updates the existing Live Activity instead of creating a duplicate. Add `entity_id` for automatic Home Assistant state, friendly name, unit, and progress mapping.
+Use `ha_livekit.end_activity` when you want to end an activity by ID.
+
+Add `entity_id` for automatic Home Assistant state, friendly name, unit, and progress mapping. Leave `entity_id` empty for a custom payload.
 
 Door:
 
@@ -93,15 +91,22 @@ data:
   template: progress
 ```
 
-More examples are in [`examples/automations.yaml`](examples/automations.yaml), including door, washing machine, light, vacuum, energy, and climate automations.
+End:
 
-Advanced explicit actions remain available for existing automations:
+```yaml
+action: ha_livekit.end_activity
+data:
+  activity_id: front_door
+```
+
+More examples are in [`examples/automations.yaml`](examples/automations.yaml).
+
+Advanced / backward compatibility actions remain available for existing automations:
 
 - `ha_livekit.start_activity`
 - `ha_livekit.update_activity`
 - `ha_livekit.start_entity_activity`
 - `ha_livekit.update_entity_activity`
-- `ha_livekit.end_activity`
 
 ## Apple Shortcuts
 
@@ -136,6 +141,11 @@ If icons or logos look stale:
 
 ## Advanced
 
-Use `ha_livekit.start_activity` and `ha_livekit.update_activity` when you want to send a custom payload instead of letting the integration build one from an entity.
+Existing automations can keep using the explicit start and update actions:
 
-The iOS app configures relay details for background delivery, including a per-home instance ID and per-instance relay credential. Reopen the iOS app after updating so the integration receives the new scoped relay identity; keep relay credentials and Home Assistant tokens private.
+- `ha_livekit.start_activity`
+- `ha_livekit.update_activity`
+- `ha_livekit.start_entity_activity`
+- `ha_livekit.update_entity_activity`
+
+Most users should use `ha_livekit.set_activity` for new automations. The iOS app handles background setup for you; you normally do not need to add relay setup actions manually. Reopen the iOS app once after updating, then restart Home Assistant after updating the integration.

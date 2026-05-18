@@ -1,143 +1,61 @@
 # Example HA LiveKit automations.
+# Most users should use ha_livekit.set_activity for starts and updates.
 # Replace entity IDs with your own Home Assistant entities.
 
-- alias: "HA LiveKit - front door opened"
-  mode: single
+- id: ha_livekit_front_door
+  alias: "HA LiveKit - Front door"
+  mode: restart
   trigger:
     - platform: state
       entity_id: binary_sensor.front_door
-      to: "on"
   action:
-    - service: ha_livekit.set_activity
+    - action: ha_livekit.set_activity
       data:
         activity_id: front_door
         entity_id: binary_sensor.front_door
         template: door
-        title: Front Door
 
-- alias: "HA LiveKit - front door closed"
+- id: ha_livekit_front_door_closed
+  alias: "HA LiveKit - Front door closed"
   mode: single
   trigger:
     - platform: state
       entity_id: binary_sensor.front_door
       to: "off"
+      for: "00:00:10"
   action:
-    - service: ha_livekit.set_activity
+    - action: ha_livekit.end_activity
       data:
         activity_id: front_door
-        entity_id: binary_sensor.front_door
-        template: door
-    - delay: "00:00:05"
-    - service: ha_livekit.end_activity
-      data:
-        activity_id: front_door
-        reason: closed
 
-- alias: "HA LiveKit - washing machine running"
+- id: ha_livekit_washing_machine
+  alias: "HA LiveKit - Washing machine"
   mode: restart
-  trigger:
-    - platform: state
-      entity_id: sensor.washing_machine_state
-      to: "running"
-  action:
-    - service: ha_livekit.set_activity
-      data:
-        activity_id: washing_machine
-        entity_id: sensor.washing_machine_state
-        progress_entity_id: sensor.washing_machine_progress
-        template: washing_machine
-        title: Laundry
-
-- alias: "HA LiveKit - washing machine progress"
-  mode: queued
   trigger:
     - platform: state
       entity_id:
-        - sensor.washing_machine_state
+        - sensor.washing_machine_power
         - sensor.washing_machine_progress
   action:
-    - service: ha_livekit.set_activity
+    - action: ha_livekit.set_activity
       data:
         activity_id: washing_machine
-        entity_id: sensor.washing_machine_state
+        entity_id: sensor.washing_machine_power
+        template: laundry
         progress_entity_id: sensor.washing_machine_progress
-        template: washing_machine
 
-- alias: "HA LiveKit - washing machine finished"
+- id: ha_livekit_custom_status
+  alias: "HA LiveKit - Custom status"
   mode: single
   trigger:
     - platform: state
-      entity_id: sensor.washing_machine_state
-      to: "finished"
-  action:
-    - service: ha_livekit.set_activity
-      data:
-        activity_id: washing_machine
-        template: washing_machine
-        title: Laundry
-        state: Finished
-        subtitle: Ready to unload
-        progress: 1
-    - delay: "00:10:00"
-    - service: ha_livekit.end_activity
-      data:
-        activity_id: washing_machine
-        reason: finished
-
-- alias: "HA LiveKit - porch light on"
-  mode: single
-  trigger:
-    - platform: state
-      entity_id: light.porch
+      entity_id: input_boolean.custom_status
       to: "on"
   action:
-    - service: ha_livekit.set_activity
+    - action: ha_livekit.set_activity
       data:
-        activity_id: porch_light
-        entity_id: light.porch
-        template: custom
-        title: Porch Light
-
-- alias: "HA LiveKit - vacuum active"
-  mode: restart
-  trigger:
-    - platform: state
-      entity_id: vacuum.downstairs
-      to:
-        - "cleaning"
-        - "returning"
-  action:
-    - service: ha_livekit.set_activity
-      data:
-        activity_id: downstairs_vacuum
-        entity_id: vacuum.downstairs
-        template: vacuum
-        title: Vacuum
-
-- alias: "HA LiveKit - energy usage changed"
-  mode: queued
-  trigger:
-    - platform: state
-      entity_id: sensor.home_power
-  action:
-    - service: ha_livekit.set_activity
-      data:
-        activity_id: home_energy
-        entity_id: sensor.home_power
-        template: energy
-        title: Home Energy
-
-- alias: "HA LiveKit - climate heating"
-  mode: restart
-  trigger:
-    - platform: state
-      entity_id: climate.living_room
-      attribute: hvac_action
-      to: "heating"
-  action:
-    - service: ha_livekit.set_activity
-      data:
-        activity_id: living_room_climate
-        entity_id: climate.living_room
-        template: climate
-        title: Living Room
+        activity_id: custom_status
+        title: "Custom Status"
+        subtitle: "Started from Home Assistant"
+        state: "Running"
+        template: progress

@@ -1,6 +1,6 @@
 set_activity:
   name: Set Live Activity
-  description: Recommended action. Start this Live Activity if it does not exist, or update the existing one with the same Activity ID. Use an entity for automatic Home Assistant state mapping, or leave entity empty for a custom payload.
+  description: Recommended action. Starts a Live Activity if it does not exist, or updates the existing one with the same activity ID.
   fields:
     activity_id:
       name: Activity ID
@@ -111,7 +111,7 @@ set_activity:
 
 start_activity:
   name: Start Live Activity
-  description: Broadcast a request for the HA LiveKit iOS app to start a Live Activity while it is open, and optionally forward it to the APNs relay.
+  description: Advanced action. Explicitly starts a custom Live Activity. Most users should use Set Live Activity instead.
   fields:
     activity_id:
       name: Activity ID
@@ -201,7 +201,7 @@ start_activity:
 
 start_entity_activity:
   name: Start Entity Live Activity
-  description: Start a Live Activity from a Home Assistant entity. HA LiveKit reads the entity state, friendly name, unit and supported attributes automatically.
+  description: Advanced action. Explicitly starts a Live Activity from a Home Assistant entity. Most users should use Set Live Activity instead.
   fields:
     activity_id:
       name: Activity ID
@@ -298,7 +298,7 @@ start_entity_activity:
 
 update_activity:
   name: Update Live Activity
-  description: Broadcast a request for the HA LiveKit iOS app to update an existing Live Activity, and optionally forward it to the APNs relay.
+  description: Advanced action. Explicitly updates an existing custom Live Activity. Most users should use Set Live Activity instead.
   fields:
     activity_id:
       name: Activity ID
@@ -385,7 +385,7 @@ update_activity:
 
 update_entity_activity:
   name: Update Entity Live Activity
-  description: Update an existing Live Activity from the current Home Assistant entity state using the same entity-based mapping as start_entity_activity.
+  description: Advanced action. Explicitly updates an entity-based Live Activity. Most users should use Set Live Activity instead.
   fields:
     activity_id:
       name: Activity ID
@@ -482,7 +482,7 @@ update_entity_activity:
 
 end_activity:
   name: End Live Activity
-  description: Broadcast a request for the HA LiveKit iOS app to end an existing Live Activity, and optionally forward it to the APNs relay.
+  description: Ends an existing HA LiveKit Live Activity by activity ID.
   fields:
     activity_id:
       name: Activity ID
@@ -508,8 +508,8 @@ end_activity:
         text:
 
 configure_managed_relay:
-  name: Configure Managed Relay
-  description: Admin-only internal service used by the HA LiveKit iOS app to provision the managed relay credential for this Home Assistant instance.
+  name: Internal Relay Setup
+  description: Internal admin-only setup used by the iOS app. You normally do not need to add this action manually.
   fields:
     relay_url:
       name: Managed relay URL
