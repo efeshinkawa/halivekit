@@ -367,6 +367,7 @@ def _display_style(template: str) -> str:
     styles = {
         "door": "security",
         "security": "security",
+        "progress": "progress",
         "laundry": "progress",
         "washing_machine": "progress",
         "washingmachine": "progress",
@@ -387,6 +388,8 @@ def _icon_name(state: State, template: str) -> str:
     if mapped_icon := _sf_symbol_from_home_assistant_icon(state.attributes.get("icon")):
         return mapped_icon
 
+    if normalized_template == "progress":
+        return "progress.indicator"
     if normalized_template in {"laundry", "washing_machine", "washingmachine"}:
         return "washer.fill"
     if normalized_template == "dishwasher":

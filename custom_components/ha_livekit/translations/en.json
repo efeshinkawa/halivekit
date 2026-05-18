@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "HA LiveKit",
-        "description": "Foreground updates work through the Home Assistant event stream. Background Live Activities use the relay configured for this build or an advanced custom relay. No extra code is required. Webhook path: {webhook_path}.",
+        "description": "HA LiveKit is ready for automations and background Live Activities. Open the iOS app once after updating so Home Assistant can finish setup. Webhook path: {webhook_path}.",
         "data": {
           "relay_enabled": "Background Live Activities",
           "relay_mode": "Relay mode",

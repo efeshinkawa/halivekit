@@ -56,6 +56,7 @@ from .const import (
     RELAY_MODE_MANAGED,
     SERVICE_CONFIGURE_MANAGED_RELAY,
     SERVICE_END_ACTIVITY,
+    SERVICE_SET_ACTIVITY,
     SERVICE_START_ACTIVITY,
     SERVICE_START_ENTITY_ACTIVITY,
     SERVICE_UPDATE_ACTIVITY,
@@ -96,6 +97,24 @@ UPDATE_ACTIVITY_SCHEMA = vol.Schema(
         vol.Optional(ATTR_TEMPLATE): cv.string,
         vol.Optional(ATTR_STATE): cv.string,
         vol.Optional(ATTR_PROGRESS): vol.Coerce(float),
+        vol.Optional(ATTR_DATA, default=dict): dict,
+    }
+)
+
+SET_ACTIVITY_SCHEMA = vol.Schema(
+    {
+        vol.Optional(ATTR_DEVICE_ID): cv.string,
+        vol.Required(ATTR_ACTIVITY_ID): cv.string,
+        vol.Optional(ATTR_ENTITY_ID): cv.entity_id,
+        vol.Optional(ATTR_TITLE): cv.string,
+        vol.Optional(ATTR_DISPLAY_NAME): cv.string,
+        vol.Optional(ATTR_SUBTITLE): cv.string,
+        vol.Optional(ATTR_TEMPLATE, default="custom"): cv.string,
+        vol.Optional(ATTR_STATE): cv.string,
+        vol.Optional(ATTR_PROGRESS): vol.Coerce(float),
+        vol.Optional(ATTR_PROGRESS_ENTITY_ID): cv.entity_id,
+        vol.Optional(ATTR_ICON_NAME): cv.string,
+        vol.Optional(ATTR_END_WHEN): vol.Any(cv.string, dict),
         vol.Optional(ATTR_DATA, default=dict): dict,
     }
 )
@@ -151,6 +170,7 @@ def _async_register_services(hass: HomeAssistant) -> None:
     expected_services = {
         SERVICE_START_ACTIVITY,
         SERVICE_UPDATE_ACTIVITY,
+        SERVICE_SET_ACTIVITY,
         SERVICE_END_ACTIVITY,
         SERVICE_START_ENTITY_ACTIVITY,
         SERVICE_UPDATE_ENTITY_ACTIVITY,
@@ -167,6 +187,9 @@ def _async_register_services(hass: HomeAssistant) -> None:
     async def handle_update(call: ServiceCall) -> None:
         await _handle_service(hass, ACTION_UPDATE, dict(call.data))
 
+    async def handle_set(call: ServiceCall) -> None:
+        await _handle_set_activity(hass, call)
+
     async def handle_end(call: ServiceCall) -> None:
         await _handle_service(hass, ACTION_END, dict(call.data))
 
@@ -182,6 +205,7 @@ def _async_register_services(hass: HomeAssistant) -> None:
     services = (
         (SERVICE_START_ACTIVITY, handle_start, START_ACTIVITY_SCHEMA),
         (SERVICE_UPDATE_ACTIVITY, handle_update, UPDATE_ACTIVITY_SCHEMA),
+        (SERVICE_SET_ACTIVITY, handle_set, SET_ACTIVITY_SCHEMA),
         (SERVICE_END_ACTIVITY, handle_end, END_ACTIVITY_SCHEMA),
         (SERVICE_START_ENTITY_ACTIVITY, handle_start_entity, ENTITY_ACTIVITY_SCHEMA),
         (SERVICE_UPDATE_ENTITY_ACTIVITY, handle_update_entity, ENTITY_ACTIVITY_SCHEMA),
@@ -256,6 +280,34 @@ async def _handle_entity_service(
 
     coordinator = _get_coordinator(hass)
     await coordinator.async_send_activity(action, entity_payload)
+
+
+async def _handle_set_activity(
+    hass: HomeAssistant,
+    call: ServiceCall,
+) -> None:
+    payload = dict(call.data)
+    entity_id = str(payload.get(ATTR_ENTITY_ID, "")).strip()
+
+    if entity_id:
+        await _async_require_entity_read_permissions(
+            hass,
+            call,
+            [
+                entity_id,
+                str(payload.get(ATTR_PROGRESS_ENTITY_ID, "")).strip(),
+            ],
+        )
+        entity_payload = build_entity_activity_payload(hass, payload, SERVICE_SET_ACTIVITY)
+        if entity_payload is None:
+            return
+
+        coordinator = _get_coordinator(hass)
+        await coordinator.async_send_activity(ACTION_START, entity_payload)
+        return
+
+    coordinator = _get_coordinator(hass)
+    await coordinator.async_send_activity(ACTION_START, payload)
 
 
 async def _handle_configure_managed_relay(

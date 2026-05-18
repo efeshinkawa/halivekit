@@ -8,7 +8,7 @@
       entity_id: binary_sensor.front_door
       to: "on"
   action:
-    - service: ha_livekit.start_entity_activity
+    - service: ha_livekit.set_activity
       data:
         activity_id: front_door
         entity_id: binary_sensor.front_door
@@ -22,7 +22,7 @@
       entity_id: binary_sensor.front_door
       to: "off"
   action:
-    - service: ha_livekit.update_entity_activity
+    - service: ha_livekit.set_activity
       data:
         activity_id: front_door
         entity_id: binary_sensor.front_door
@@ -40,7 +40,7 @@
       entity_id: sensor.washing_machine_state
       to: "running"
   action:
-    - service: ha_livekit.start_entity_activity
+    - service: ha_livekit.set_activity
       data:
         activity_id: washing_machine
         entity_id: sensor.washing_machine_state
@@ -56,7 +56,7 @@
         - sensor.washing_machine_state
         - sensor.washing_machine_progress
   action:
-    - service: ha_livekit.update_entity_activity
+    - service: ha_livekit.set_activity
       data:
         activity_id: washing_machine
         entity_id: sensor.washing_machine_state
@@ -70,7 +70,7 @@
       entity_id: sensor.washing_machine_state
       to: "finished"
   action:
-    - service: ha_livekit.update_activity
+    - service: ha_livekit.set_activity
       data:
         activity_id: washing_machine
         template: washing_machine
@@ -91,7 +91,7 @@
       entity_id: light.porch
       to: "on"
   action:
-    - service: ha_livekit.start_entity_activity
+    - service: ha_livekit.set_activity
       data:
         activity_id: porch_light
         entity_id: light.porch
@@ -107,7 +107,7 @@
         - "cleaning"
         - "returning"
   action:
-    - service: ha_livekit.start_entity_activity
+    - service: ha_livekit.set_activity
       data:
         activity_id: downstairs_vacuum
         entity_id: vacuum.downstairs
@@ -120,7 +120,7 @@
     - platform: state
       entity_id: sensor.home_power
   action:
-    - service: ha_livekit.update_entity_activity
+    - service: ha_livekit.set_activity
       data:
         activity_id: home_energy
         entity_id: sensor.home_power
@@ -135,7 +135,7 @@
       attribute: hvac_action
       to: "heating"
   action:
-    - service: ha_livekit.start_entity_activity
+    - service: ha_livekit.set_activity
       data:
         activity_id: living_room_climate
         entity_id: climate.living_room

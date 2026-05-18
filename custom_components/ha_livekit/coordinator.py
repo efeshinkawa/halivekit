@@ -243,7 +243,7 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
     @staticmethod
     def _normalize_action(action: str) -> str:
         normalized = action.strip().lower().replace("-", "_")
-        if normalized in {ACTION_START, "start_activity", "start_entity_activity"}:
+        if normalized in {ACTION_START, "set_activity", "start_activity", "start_entity_activity"}:
             return ACTION_START
         if normalized in {ACTION_UPDATE, "update_activity", "update_entity_activity"}:
             return ACTION_UPDATE

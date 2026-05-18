@@ -36,6 +36,7 @@ EVENT_ACTIVITY_REQUEST = "ha_livekit_activity_request"
 
 SERVICE_START_ACTIVITY = "start_activity"
 SERVICE_UPDATE_ACTIVITY = "update_activity"
+SERVICE_SET_ACTIVITY = "set_activity"
 SERVICE_END_ACTIVITY = "end_activity"
 SERVICE_START_ENTITY_ACTIVITY = "start_entity_activity"
 SERVICE_UPDATE_ENTITY_ACTIVITY = "update_entity_activity"

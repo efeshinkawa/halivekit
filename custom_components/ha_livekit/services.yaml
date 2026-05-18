@@ -1,3 +1,114 @@
+set_activity:
+  name: Set Live Activity
+  description: Recommended action. Start this Live Activity if it does not exist, or update the existing one with the same Activity ID. Use an entity for automatic Home Assistant state mapping, or leave entity empty for a custom payload.
+  fields:
+    activity_id:
+      name: Activity ID
+      description: Stable ID for this Live Activity, e.g. front_door or washing_machine. Reusing the same ID updates the existing activity instead of creating a duplicate.
+      required: true
+      example: front_door
+      selector:
+        text:
+    entity_id:
+      name: Entity
+      description: Optional Home Assistant entity used to build the Live Activity state automatically.
+      required: false
+      example: binary_sensor.front_door
+      selector:
+        entity:
+    template:
+      name: Template
+      description: Visual template hint. Leave empty to infer from the entity when possible.
+      required: false
+      default: custom
+      selector:
+        select:
+          options:
+            - custom
+            - progress
+            - door
+            - laundry
+            - washing_machine
+            - dishwasher
+            - vacuum
+            - security
+            - climate
+            - energy
+            - timer
+    title:
+      name: Title
+      description: Optional title. For entity activities this defaults to the entity friendly name.
+      required: false
+      example: Door Alert
+      selector:
+        text:
+    display_name:
+      name: Display name
+      description: Optional friendly label shown in the Live Activity.
+      required: false
+      example: Front Door
+      selector:
+        text:
+    subtitle:
+      name: Subtitle
+      description: Optional short status line.
+      required: false
+      example: Opened
+      selector:
+        text:
+    state:
+      name: State
+      description: Optional custom state text. Entity activities read the current entity state automatically when this is empty.
+      required: false
+      example: Running
+      selector:
+        text:
+    progress_entity_id:
+      name: Progress entity
+      description: Optional entity whose numeric state should be used as progress. Percent values are converted to 0.0-1.0 automatically.
+      required: false
+      example: sensor.washing_machine_progress
+      selector:
+        entity:
+    progress:
+      name: Progress override
+      description: Optional progress value from 0.0 to 1.0.
+      required: false
+      selector:
+        number:
+          min: 0
+          max: 1
+          step: 0.01
+          mode: slider
+    icon_name:
+      name: Icon
+      description: Optional SF Symbol override, e.g. lightbulb.fill or door.left.hand.open.
+      required: false
+      advanced: true
+      selector:
+        text:
+    data:
+      name: Extra data
+      description: Advanced optional data such as icon_name, display_style, theme, secondary_state or unit.
+      required: false
+      advanced: true
+      selector:
+        object:
+    end_when:
+      name: End when
+      description: Optional advanced metadata for future auto-end rules. HA LiveKit includes it in the payload but does not end activities automatically from this field.
+      required: false
+      advanced: true
+      selector:
+        object:
+    device_id:
+      name: Device ID
+      description: Optional advanced routing field. Leave empty to broadcast to any connected HA LiveKit iOS app.
+      required: false
+      advanced: true
+      selector:
+        text:
+
 start_activity:
   name: Start Live Activity
   description: Broadcast a request for the HA LiveKit iOS app to start a Live Activity while it is open, and optionally forward it to the APNs relay.
@@ -46,6 +157,7 @@ start_activity:
         select:
           options:
             - custom
+            - progress
             - door
             - laundry
             - washing_machine
@@ -113,6 +225,7 @@ start_entity_activity:
         select:
           options:
             - custom
+            - progress
             - door
             - laundry
             - washing_machine
@@ -228,6 +341,7 @@ update_activity:
         select:
           options:
             - custom
+            - progress
             - door
             - laundry
             - washing_machine
@@ -295,6 +409,7 @@ update_entity_activity:
         select:
           options:
             - custom
+            - progress
             - door
             - laundry
             - washing_machine

@@ -48,45 +48,60 @@ Keep your Long-Lived Access Token private. Do not paste it into automations, Git
 
 ## Automations
 
-HA LiveKit adds these Home Assistant services:
-
-- `ha_livekit.start_entity_activity`
-- `ha_livekit.update_entity_activity`
-- `ha_livekit.end_activity`
-- `ha_livekit.start_activity`
-- `ha_livekit.update_activity`
-
-Entity-based services are the easiest place to start:
+Most users should use:
 
 ```yaml
-service: ha_livekit.start_entity_activity
-data:
-  activity_id: front_door
-  entity_id: binary_sensor.front_door
-  template: door
-  title: Front Door
-```
-
-Update the same activity from the latest entity state:
-
-```yaml
-service: ha_livekit.update_entity_activity
+action: ha_livekit.set_activity
 data:
   activity_id: front_door
   entity_id: binary_sensor.front_door
   template: door
 ```
 
-End it:
+`set_activity` starts the Live Activity if it does not exist. If the same `activity_id` is already active, it updates the existing Live Activity instead of creating a duplicate. Add `entity_id` for automatic Home Assistant state, friendly name, unit, and progress mapping.
+
+Door:
 
 ```yaml
-service: ha_livekit.end_activity
+action: ha_livekit.set_activity
 data:
   activity_id: front_door
-  reason: closed
+  entity_id: binary_sensor.front_door
+  template: door
+```
+
+Laundry:
+
+```yaml
+action: ha_livekit.set_activity
+data:
+  activity_id: washing_machine
+  entity_id: sensor.washing_machine_power
+  template: laundry
+  progress_entity_id: sensor.washing_machine_progress
+```
+
+Custom:
+
+```yaml
+action: ha_livekit.set_activity
+data:
+  activity_id: custom_status
+  title: "Custom Status"
+  subtitle: "Started from Home Assistant"
+  state: "Running"
+  template: progress
 ```
 
 More examples are in [`examples/automations.yaml`](examples/automations.yaml), including door, washing machine, light, vacuum, energy, and climate automations.
+
+Advanced explicit actions remain available for existing automations:
+
+- `ha_livekit.start_activity`
+- `ha_livekit.update_activity`
+- `ha_livekit.start_entity_activity`
+- `ha_livekit.update_entity_activity`
+- `ha_livekit.end_activity`
 
 ## Apple Shortcuts
 
