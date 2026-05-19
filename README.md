@@ -149,3 +149,7 @@ Existing automations can keep using the explicit start and update actions:
 - `ha_livekit.update_entity_activity`
 
 Most users should use `ha_livekit.set_activity` for new automations. The iOS app handles background setup for you; you normally do not need to add relay setup actions manually. Reopen the iOS app once after updating, then restart Home Assistant after updating the integration.
+
+## Privacy and security
+
+Privacy Policy: [PRIVACY.md](PRIVACY.md)
