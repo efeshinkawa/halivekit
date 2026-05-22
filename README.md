@@ -2,6 +2,8 @@
 
 HA LiveKit connects Home Assistant automations to the HA LiveKit iOS app so your home can start, update, and end iPhone Live Activities.
 
+App Store: https://apps.apple.com/us/app/ha-livekit/id6769399254
+
 ## What it does
 
 Use Home Assistant services to create Live Activities for doors, laundry, lights, vacuums, energy usage, climate status, timers, and other entities. The iOS app listens for Home Assistant events while open and can also support background updates when the app has configured its relay connection.
