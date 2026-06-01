@@ -1,6 +1,6 @@
 # HA LiveKit
 
-<p align="center"><img src="logo.png" alt="HA LiveKit logo" width="320"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/efeshinkawa/halivekit/main/logo.png" alt="HA LiveKit logo" width="320"></p>
 
 HA LiveKit connects Home Assistant automations to the HA LiveKit iOS app so your home can start, update, and end iPhone Live Activities.
 

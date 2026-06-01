@@ -30,4 +30,4 @@ HA LiveKit does not sell user data. HA LiveKit does not use user data for third-
 
 For privacy questions, contact:
 
-erimefe@gmail.com
+erimefe@efeyesoylegelsin.com
