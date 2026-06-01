@@ -48,6 +48,10 @@ Use Home Assistant services to create Live Activities for doors, laundry, lights
 
 Keep your Long-Lived Access Token private. Do not paste it into automations, GitHub issues, screenshots, or public logs.
 
+### Optional: Internal and External URLs
+
+If you need different addresses on your home Wi-Fi and away from home (for example, NAT loopback or a local hostname), open the connection section in Settings and enable the optional Internal and External URL fields. When both are set, HA LiveKit tries the Internal URL first and falls back to the External URL only on connectivity errors. Authentication errors are not hidden. Existing single-URL setups keep working unchanged.
+
 ## Automations
 
 Most users should use `ha_livekit.set_activity`.
