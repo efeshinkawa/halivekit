@@ -177,7 +177,7 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
         relay_error = None
         relay_enabled = self.relay_enabled
         relay_url = self.relay_url.strip()
-        _LOGGER.warning(
+        _LOGGER.debug(
             "HA LiveKit relay forwarding state: enabled=%s mode=%s relay_url_present=%s activity_id=%s action=%s",
             relay_enabled,
             self.relay_mode,
@@ -192,7 +192,7 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
             self.async_update_listeners()
         else:
             self.last_relay_error = "Relay forwarding disabled"
-            _LOGGER.warning("HA LiveKit background relay forwarding disabled; foreground event bus only")
+            _LOGGER.debug("HA LiveKit background relay forwarding disabled; foreground event bus only")
 
         return DispatchResult(
             delivered_locally=True,
@@ -275,7 +275,7 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
                 self.last_relay_error = "Custom relay shared secret missing"
                 _LOGGER.warning("HA LiveKit APNs relay skipped: %s", self.last_relay_error)
                 return False
-            _LOGGER.warning(
+            _LOGGER.debug(
                 "HA LiveKit managed relay secret missing; attempting POST so relay diagnostics are visible"
             )
 
@@ -301,7 +301,7 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
         if relay_secret:
             headers[HEADER_SECRET] = relay_secret
         url = f"{relay_url.rstrip('/')}/{action}"
-        _LOGGER.warning(
+        _LOGGER.debug(
             "HA LiveKit relay POST attempt: enabled=%s url_present=%s endpoint=%s activity_id=%s secret_present=%s environment=%s instance_id_prefix=%s",
             self.relay_enabled,
             bool(relay_url),
@@ -331,7 +331,7 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
                         self.last_relay_response,
                     )
                     return False
-                _LOGGER.warning(
+                _LOGGER.debug(
                     "HA LiveKit relay POST status: endpoint=%s status=%s response=%s",
                     action,
                     response.status,

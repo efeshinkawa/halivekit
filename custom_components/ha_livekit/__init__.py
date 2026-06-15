@@ -69,6 +69,23 @@ from .webhook import async_register_webhook
 _LOGGER = logging.getLogger(__name__)
 _SERVICES_REGISTERED = "_services_registered"
 _APP_SECRET_HEADER = "X-HA-LiveKit-App-Secret"
+_DUPLICATE_ACTIVITY_NAME_ERROR = "duplicate_activity_name"
+_DUPLICATE_ACTIVITY_NAME_MESSAGE = "An active Live Activity with this name already exists. Please choose another name."
+_ENTITY_ID_PATTERN = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*\.[A-Za-z0-9_]+$")
+_GENERIC_ENTITY_REFERENCE_KEYS = {
+    ATTR_ENTITY_ID,
+    ATTR_PROGRESS_ENTITY_ID,
+    "entityId",
+    "primaryEntity",
+    "primaryEntityId",
+    "primary_entity",
+    "primary_entity_id",
+    "progressEntityId",
+    "secondaryEntity",
+    "secondaryEntityId",
+    "secondary_entity",
+    "secondary_entity_id",
+}
 
 
 START_ACTIVITY_SCHEMA = vol.Schema(
@@ -182,16 +199,16 @@ def _async_register_services(hass: HomeAssistant) -> None:
         return
 
     async def handle_start(call: ServiceCall) -> None:
-        await _handle_service(hass, ACTION_START, dict(call.data))
+        await _handle_service(hass, ACTION_START, call)
 
     async def handle_update(call: ServiceCall) -> None:
-        await _handle_service(hass, ACTION_UPDATE, dict(call.data))
+        await _handle_service(hass, ACTION_UPDATE, call)
 
     async def handle_set(call: ServiceCall) -> None:
         await _handle_set_activity(hass, call)
 
     async def handle_end(call: ServiceCall) -> None:
-        await _handle_service(hass, ACTION_END, dict(call.data))
+        await _handle_service(hass, ACTION_END, call)
 
     async def handle_start_entity(call: ServiceCall) -> None:
         await _handle_entity_service(hass, ACTION_START, call, SERVICE_START_ENTITY_ACTIVITY)
@@ -253,10 +270,13 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def _handle_service(
     hass: HomeAssistant,
     action: str,
-    payload: dict[str, Any],
+    call: ServiceCall,
 ) -> None:
+    payload = dict(call.data)
     coordinator = _get_coordinator(hass)
-    await coordinator.async_send_activity(action, payload)
+    await _async_require_generic_activity_permissions(hass, call, payload)
+    result = await coordinator.async_send_activity(action, payload)
+    _raise_if_duplicate_activity_name_rejected(result)
 
 
 async def _handle_entity_service(
@@ -279,7 +299,8 @@ async def _handle_entity_service(
         return
 
     coordinator = _get_coordinator(hass)
-    await coordinator.async_send_activity(action, entity_payload)
+    result = await coordinator.async_send_activity(action, entity_payload)
+    _raise_if_duplicate_activity_name_rejected(result)
 
 
 async def _handle_set_activity(
@@ -303,11 +324,13 @@ async def _handle_set_activity(
             return
 
         coordinator = _get_coordinator(hass)
-        await coordinator.async_send_activity(ACTION_START, entity_payload)
+        result = await coordinator.async_send_activity(ACTION_START, entity_payload)
+        _raise_if_duplicate_activity_name_rejected(result)
         return
 
     coordinator = _get_coordinator(hass)
-    await coordinator.async_send_activity(ACTION_START, payload)
+    result = await coordinator.async_send_activity(ACTION_START, payload)
+    _raise_if_duplicate_activity_name_rejected(result)
 
 
 async def _handle_configure_managed_relay(
@@ -357,7 +380,7 @@ async def _handle_configure_managed_relay(
     }
     hass.config_entries.async_update_entry(entry, options=options)
     coordinator.async_update_listeners()
-    _LOGGER.warning(
+    _LOGGER.info(
         "HA LiveKit managed relay configured from iOS app: relay_url_present=%s secret_present=%s environment=%s",
         bool(relay_url),
         bool(relay_secret),
@@ -408,6 +431,104 @@ async def _async_require_entity_read_permissions(
             )
 
 
+async def _async_require_generic_activity_permissions(
+    hass: HomeAssistant,
+    call: ServiceCall,
+    payload: dict[str, Any],
+) -> None:
+    """Reject generic activity calls that reference unreadable entity state."""
+    await _async_require_entity_read_permissions(
+        hass,
+        call,
+        _generic_activity_entity_ids(hass, payload),
+    )
+
+
+def _generic_activity_entity_ids(hass: HomeAssistant, payload: dict[str, Any]) -> list[str]:
+    """Return entity ids a generic activity request can render or mutate."""
+    entity_ids: list[str] = []
+    entity_ids.extend(_payload_entity_references(payload))
+
+    activity_id = _clean_string(payload.get(ATTR_ACTIVITY_ID))
+    if activity_id:
+        entity_ids.extend(_entity_ids_for_activity_id(hass, activity_id))
+
+    return _dedupe_entity_ids(entity_ids)
+
+
+def _payload_entity_references(payload: dict[str, Any]) -> list[str]:
+    entity_ids: list[str] = []
+    entity_ids.extend(_entity_references_from_mapping(payload))
+
+    data = payload.get(ATTR_DATA)
+    if isinstance(data, dict):
+        entity_ids.extend(_entity_references_from_mapping(data))
+
+    return entity_ids
+
+
+def _entity_references_from_mapping(mapping: dict[str, Any]) -> list[str]:
+    entity_ids: list[str] = []
+    for key in _GENERIC_ENTITY_REFERENCE_KEYS:
+        if key in mapping:
+            entity_ids.extend(_entity_references_from_value(mapping[key]))
+    return entity_ids
+
+
+def _entity_references_from_value(value: Any) -> list[str]:
+    if isinstance(value, str):
+        entity_id = value.strip()
+        return [entity_id] if _ENTITY_ID_PATTERN.match(entity_id) else []
+    if isinstance(value, dict):
+        entity_ids: list[str] = []
+        for item in value.values():
+            entity_ids.extend(_entity_references_from_value(item))
+        return entity_ids
+    if isinstance(value, (list, tuple, set)):
+        entity_ids = []
+        for item in value:
+            entity_ids.extend(_entity_references_from_value(item))
+        return entity_ids
+    return []
+
+
+def _entity_ids_for_activity_id(hass: HomeAssistant, activity_id: str) -> list[str]:
+    states = getattr(hass, "states", None)
+    async_all = getattr(states, "async_all", None)
+    if async_all is None:
+        return []
+
+    entity_ids: list[str] = []
+    for state in async_all():
+        entity_id = str(getattr(state, "entity_id", "")).strip()
+        if entity_id and (
+            entity_id == activity_id or _activity_id_from_entity_id(entity_id) == activity_id
+        ):
+            entity_ids.append(entity_id)
+    return entity_ids
+
+
+def _activity_id_from_entity_id(entity_id: str) -> str:
+    object_id = entity_id.split(".", 1)[-1]
+    value = re.sub(r"[^A-Za-z0-9_-]+", "_", object_id).strip("_")
+    value = re.sub(r"_+", "_", value)
+    return value or "ha_livekit_activity"
+
+
+def _dedupe_entity_ids(entity_ids: list[str]) -> list[str]:
+    deduped: list[str] = []
+    for entity_id in entity_ids:
+        if entity_id and entity_id not in deduped:
+            deduped.append(entity_id)
+    return deduped
+
+
+def _clean_string(value: Any) -> str:
+    if value is None:
+        return ""
+    return str(value).strip()
+
+
 async def _async_provision_managed_relay_secret(
     hass: HomeAssistant,
     relay_url: str,
@@ -454,6 +575,17 @@ def _get_coordinator(hass: HomeAssistant) -> HALiveKitCoordinator:
             return coordinator
 
     raise HomeAssistantError("HA LiveKit is not configured")
+
+
+def _raise_if_duplicate_activity_name_rejected(result: Any) -> None:
+    """Surface explicit duplicate-name relay rejections without changing relay-outage tolerance."""
+    if result is None:
+        return
+
+    relay_status_code = getattr(result, "relay_status_code", None)
+    relay_error = str(getattr(result, "relay_error", "") or "")
+    if relay_status_code == 409 and _DUPLICATE_ACTIVITY_NAME_ERROR in relay_error:
+        raise HomeAssistantError(_DUPLICATE_ACTIVITY_NAME_MESSAGE)
 
 
 def _valid_home_assistant_instance_id(value: str) -> bool:
