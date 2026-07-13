@@ -18,6 +18,7 @@ from homeassistant.helpers.selector import (
 )
 
 from .const import (
+    CONF_ALLOW_LEGACY_WEBHOOK_SECRET,
     CONF_PUSH_ENDPOINT_URL,
     CONF_RELAY_ENABLED,
     CONF_RELAY_ENVIRONMENT,
@@ -79,6 +80,10 @@ def _schema(
             CONF_RELAY_MODE,
             default=relay_mode,
         ): vol.In(RELAY_MODE_OPTIONS),
+        vol.Optional(
+            CONF_ALLOW_LEGACY_WEBHOOK_SECRET,
+            default=bool(defaults.get(CONF_ALLOW_LEGACY_WEBHOOK_SECRET, False)),
+        ): BooleanSelector(),
     }
 
     if show_custom:
@@ -105,6 +110,7 @@ def _schema(
 def _finalize_input(user_input: dict[str, Any], defaults: dict[str, Any] | None = None) -> dict[str, Any]:
     data = {**(defaults or {}), **user_input}
     data.setdefault(CONF_SHARED_SECRET, secrets.token_urlsafe(32))
+    data.setdefault(CONF_ALLOW_LEGACY_WEBHOOK_SECRET, False)
     data.setdefault(CONF_RELAY_MODE, RELAY_MODE_MANAGED)
     data.setdefault(
         CONF_RELAY_ENABLED,

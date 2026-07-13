@@ -9,6 +9,7 @@ import hmac
 import json
 import logging
 import re
+import time
 from typing import Any
 
 from aiohttp import ClientTimeout
@@ -22,6 +23,7 @@ from .const import (
     ACTION_END,
     ACTION_START,
     ACTION_UPDATE,
+    CONF_ALLOW_LEGACY_WEBHOOK_SECRET,
     CONF_PUSH_ENDPOINT_URL,
     CONF_HOME_ASSISTANT_INSTANCE_ID,
     CONF_RELAY_ENABLED,
@@ -40,9 +42,25 @@ from .const import (
     RELAY_ENVIRONMENT_SANDBOX,
     RELAY_MODE_CUSTOM,
     RELAY_MODE_MANAGED,
+    WEBHOOK_MAX_CLOCK_SKEW_SECONDS,
+    WEBHOOK_REPLAY_CACHE_MAX_ENTRIES,
+    WEBHOOK_REPLAY_CACHE_TTL_SECONDS,
+    UNSAFE_HOME_ASSISTANT_INSTANCE_IDS,
 )
 
 _LOGGER = logging.getLogger(__name__)
+_WEBHOOK_NONCE_PATTERN = re.compile(r"[A-Za-z0-9._~-]{16,128}")
+_WEBHOOK_SIGNATURE_PATTERN = re.compile(r"(?:sha256=)?[a-f0-9]{64}")
+_MAX_RELAY_RESPONSE_BYTES = 32 * 1024
+
+WEBHOOK_AUTH_OK = "ok"
+WEBHOOK_AUTH_OK_LEGACY_SIGNATURE = "ok_legacy_signature"
+WEBHOOK_AUTH_OK_LEGACY_SECRET = "ok_legacy_secret"
+WEBHOOK_AUTH_UNAUTHORIZED = "unauthorized"
+WEBHOOK_AUTH_INVALID_FRESHNESS = "invalid_freshness"
+WEBHOOK_AUTH_STALE = "stale"
+WEBHOOK_AUTH_REPLAYED = "replayed"
+WEBHOOK_AUTH_LEGACY_SECRET_DISABLED = "legacy_secret_disabled"
 
 
 @dataclass(slots=True)
@@ -68,6 +86,8 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
         self.last_relay_status_code: int | None = None
         self.last_relay_response: str | None = None
         self.last_relay_error: str | None = None
+        self._webhook_replay_cache: dict[str, float] = {}
+        self._legacy_webhook_warning_logged = False
 
     @property
     def shared_secret(self) -> str:
@@ -75,6 +95,16 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
         return self.config_entry.options.get(
             CONF_SHARED_SECRET,
             self.config_entry.data.get(CONF_SHARED_SECRET, ""),
+        )
+
+    @property
+    def allow_legacy_webhook_secret(self) -> bool:
+        """Return whether deprecated plaintext webhook secret auth is enabled."""
+        return bool(
+            self.config_entry.options.get(
+                CONF_ALLOW_LEGACY_WEBHOOK_SECRET,
+                self.config_entry.data.get(CONF_ALLOW_LEGACY_WEBHOOK_SECRET, False),
+            )
         )
 
     @property
@@ -156,7 +186,7 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
             CONF_HOME_ASSISTANT_INSTANCE_ID,
             self.config_entry.data.get(CONF_HOME_ASSISTANT_INSTANCE_ID, ""),
         )
-        return value if _valid_home_assistant_instance_id(value) else ""
+        return value.strip() if _valid_home_assistant_instance_id(value) else ""
 
     async def async_send_activity(
         self,
@@ -210,25 +240,136 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
         payload = {key: value for key, value in payload.items() if key not in {"secret"}}
         return await self.async_send_activity(action, payload)
 
-    def signature_for_bytes(self, body: bytes) -> str:
-        """Return a sha256 HMAC signature for a raw request body."""
-        digest = hmac.new(self.shared_secret.encode(), body, hashlib.sha256).hexdigest()
+    def signature_for_bytes(
+        self,
+        body: bytes,
+        timestamp: str | None = None,
+        nonce: str | None = None,
+    ) -> str:
+        """Return a sha256 HMAC for either legacy or freshness-bound requests."""
+        signed_bytes = _webhook_signed_bytes(body, timestamp, nonce)
+        digest = hmac.new(self.shared_secret.encode(), signed_bytes, hashlib.sha256).hexdigest()
         return f"sha256={digest}"
 
-    def verify_signature(self, body: bytes, signature: str | None, secret: str | None) -> bool:
-        """Verify HMAC signature, falling back to explicit shared secret for simple clients."""
+    def verify_signature(
+        self,
+        body: bytes,
+        signature: str | None,
+        secret: str | None = None,
+        timestamp: str | None = None,
+        nonce: str | None = None,
+    ) -> bool:
+        """Verify HMAC or an explicitly enabled legacy plaintext secret."""
         if not self.shared_secret:
             return False
 
         if signature:
-            expected = self.signature_for_bytes(body)
+            if not _WEBHOOK_SIGNATURE_PATTERN.fullmatch(signature):
+                return False
+            if bool(timestamp) != bool(nonce):
+                return False
+            expected = self.signature_for_bytes(body, timestamp, nonce)
             normalized = signature if signature.startswith("sha256=") else f"sha256={signature}"
             return hmac.compare_digest(expected, normalized)
 
-        if secret:
+        if secret and self.allow_legacy_webhook_secret:
             return hmac.compare_digest(self.shared_secret, secret)
 
         return False
+
+    def authenticate_webhook_request(
+        self,
+        body: bytes,
+        signature: str | None,
+        timestamp: str | None,
+        nonce: str | None,
+        legacy_secret: str | None,
+        *,
+        now: float | None = None,
+    ) -> str:
+        """Authenticate a webhook request and atomically reject replay attempts."""
+        current_time = time.time() if now is None else now
+
+        if timestamp or nonce:
+            if not timestamp or not nonce or not signature:
+                return WEBHOOK_AUTH_INVALID_FRESHNESS
+            if len(timestamp) > 12 or not timestamp.isascii() or not timestamp.isdigit():
+                return WEBHOOK_AUTH_INVALID_FRESHNESS
+            try:
+                request_time = int(timestamp)
+            except (TypeError, ValueError):
+                return WEBHOOK_AUTH_INVALID_FRESHNESS
+            if not _WEBHOOK_NONCE_PATTERN.fullmatch(nonce):
+                return WEBHOOK_AUTH_INVALID_FRESHNESS
+            if abs(current_time - request_time) > WEBHOOK_MAX_CLOCK_SKEW_SECONDS:
+                return WEBHOOK_AUTH_STALE
+            if not self.verify_signature(
+                body,
+                signature,
+                timestamp=timestamp,
+                nonce=nonce,
+            ):
+                return WEBHOOK_AUTH_UNAUTHORIZED
+
+            replay_key = f"fresh:{hashlib.sha256(nonce.encode()).hexdigest()}"
+            if not self._consume_webhook_replay_key(replay_key, current_time):
+                return WEBHOOK_AUTH_REPLAYED
+            return WEBHOOK_AUTH_OK
+
+        if signature:
+            if not self.verify_signature(body, signature):
+                return WEBHOOK_AUTH_UNAUTHORIZED
+
+            # Legacy HMAC clients stay compatible, but identical captured bodies
+            # cannot be replayed during the cache window. New clients should send
+            # timestamp + nonce headers so freshness is cryptographically bound.
+            replay_key = f"legacy-signature:{hashlib.sha256(body).hexdigest()}"
+            if not self._consume_webhook_replay_key(replay_key, current_time):
+                return WEBHOOK_AUTH_REPLAYED
+            self._warn_legacy_webhook_auth_once("HMAC without timestamp and nonce")
+            return WEBHOOK_AUTH_OK_LEGACY_SIGNATURE
+
+        if legacy_secret:
+            if not self.allow_legacy_webhook_secret:
+                return WEBHOOK_AUTH_LEGACY_SECRET_DISABLED
+            if not self.verify_signature(body, None, legacy_secret):
+                return WEBHOOK_AUTH_UNAUTHORIZED
+
+            replay_key = f"legacy-secret:{hashlib.sha256(body).hexdigest()}"
+            if not self._consume_webhook_replay_key(replay_key, current_time):
+                return WEBHOOK_AUTH_REPLAYED
+            self._warn_legacy_webhook_auth_once("plaintext shared secret")
+            return WEBHOOK_AUTH_OK_LEGACY_SECRET
+
+        return WEBHOOK_AUTH_UNAUTHORIZED
+
+    def _consume_webhook_replay_key(self, replay_key: str, now: float) -> bool:
+        """Record one authenticated request key in a bounded in-memory cache."""
+        expired = [
+            key
+            for key, expires_at in self._webhook_replay_cache.items()
+            if expires_at <= now
+        ]
+        for key in expired:
+            self._webhook_replay_cache.pop(key, None)
+
+        if replay_key in self._webhook_replay_cache:
+            return False
+
+        while len(self._webhook_replay_cache) >= WEBHOOK_REPLAY_CACHE_MAX_ENTRIES:
+            self._webhook_replay_cache.pop(next(iter(self._webhook_replay_cache)))
+        self._webhook_replay_cache[replay_key] = now + WEBHOOK_REPLAY_CACHE_TTL_SECONDS
+        return True
+
+    def _warn_legacy_webhook_auth_once(self, mechanism: str) -> None:
+        """Log one migration warning without creating an attacker-controlled flood."""
+        if self._legacy_webhook_warning_logged:
+            return
+        self._legacy_webhook_warning_logged = True
+        _LOGGER.warning(
+            "Accepted deprecated HA LiveKit webhook authentication (%s); migrate to timestamped HMAC",
+            mechanism,
+        )
 
     def _normalize_message(self, action: str, payload: dict[str, Any]) -> dict[str, Any]:
         normalized_action = self._normalize_action(action)
@@ -318,9 +459,42 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
                 data=body,
                 headers=headers,
                 timeout=ClientTimeout(total=10),
+                allow_redirects=False,
             ) as response:
-                text = await response.text()
                 self.last_relay_status_code = response.status
+                if 300 <= response.status < 400:
+                    self.last_relay_response = "redirect rejected"
+                    self.last_relay_error = f"HTTP {response.status}: redirect rejected"
+                    _LOGGER.warning(
+                        "HA LiveKit relay POST rejected redirect: endpoint=%s status=%s",
+                        action,
+                        response.status,
+                    )
+                    return False
+                raw_response = await _async_read_limited_stream(
+                    response,
+                    _MAX_RELAY_RESPONSE_BYTES,
+                )
+                if raw_response is None:
+                    self.last_relay_response = "response too large"
+                    self.last_relay_error = "Relay response exceeded 32 KiB"
+                    _LOGGER.warning(
+                        "HA LiveKit relay POST rejected oversized response: endpoint=%s status=%s",
+                        action,
+                        response.status,
+                    )
+                    return False
+                try:
+                    text = raw_response.decode(response.charset or "utf-8")
+                except (LookupError, UnicodeDecodeError):
+                    self.last_relay_response = "invalid response encoding"
+                    self.last_relay_error = "Relay returned invalid text"
+                    _LOGGER.warning(
+                        "HA LiveKit relay POST rejected invalid text: endpoint=%s status=%s",
+                        action,
+                        response.status,
+                    )
+                    return False
                 self.last_relay_response = _safe_response_summary(text)
                 if response.status >= 400:
                     self.last_relay_error = f"HTTP {response.status}: {self.last_relay_response}"
@@ -345,6 +519,29 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
         return True
 
 
+async def _async_read_limited_stream(source: Any, limit: int) -> bytes | None:
+    """Read an aiohttp response without buffering beyond the safety limit."""
+    content_length = getattr(source, "content_length", None)
+    if isinstance(content_length, int) and content_length > limit:
+        return None
+    stream = getattr(source, "content", None)
+    if stream is None or not hasattr(stream, "read"):
+        raw = await source.read()
+        return raw if len(raw) <= limit else None
+
+    chunks: list[bytes] = []
+    size = 0
+    while True:
+        chunk = await stream.read(min(4096, limit + 1 - size))
+        if not chunk:
+            break
+        chunks.append(chunk)
+        size += len(chunk)
+        if size > limit:
+            return None
+    return b"".join(chunks)
+
+
 def _safe_response_summary(text: str) -> str:
     """Return a short relay response summary without full APNs tokens."""
     if not text:
@@ -359,11 +556,27 @@ def _safe_response_summary(text: str) -> str:
     return redacted[:700]
 
 
+def _webhook_signed_bytes(
+    body: bytes,
+    timestamp: str | None,
+    nonce: str | None,
+) -> bytes:
+    """Return the versioned bytes covered by a freshness-bound webhook HMAC."""
+    if timestamp is None and nonce is None:
+        return body
+    if not timestamp or not nonce:
+        return b""
+    return b"ha-livekit-v1\n" + timestamp.encode() + b"\n" + nonce.encode() + b"\n" + body
+
+
 def _valid_home_assistant_instance_id(value: Any) -> bool:
     """Return whether a Home Assistant instance id can be used for relay routing."""
     if not isinstance(value, str):
         return False
-    return bool(re.fullmatch(r"ha_[a-f0-9]{32}", value.strip()))
+    normalized = value.strip()
+    return bool(re.fullmatch(r"ha_[a-f0-9]{32}", normalized)) and (
+        normalized not in UNSAFE_HOME_ASSISTANT_INSTANCE_IDS
+    )
 
 
 def _log_instance_id(value: str) -> str:

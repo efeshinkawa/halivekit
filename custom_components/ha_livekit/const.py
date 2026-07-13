@@ -5,7 +5,7 @@ from __future__ import annotations
 from homeassistant.const import Platform
 
 DOMAIN = "ha_livekit"
-VERSION = "0.1.0"
+VERSION = "2.0.0"
 
 CONF_SHARED_SECRET = "shared_secret"
 CONF_PUSH_ENDPOINT_URL = "push_endpoint_url"
@@ -16,7 +16,14 @@ CONF_RELAY_SHARED_SECRET = "relay_shared_secret"
 CONF_RELAY_APP_REGISTRATION_SECRET = "relay_app_registration_secret"
 CONF_RELAY_ENVIRONMENT = "relay_environment"
 CONF_HOME_ASSISTANT_INSTANCE_ID = "home_assistant_instance_id"
+CONF_PENDING_MANAGED_RELAY_INSTANCE_ID = "pending_managed_relay_instance_id"
+CONF_PENDING_MANAGED_RELAY_SHARED_SECRET = "pending_managed_relay_shared_secret"
 CONF_DEVICE_ID = "device_id"
+CONF_ALLOW_LEGACY_WEBHOOK_SECRET = "allow_legacy_webhook_secret"
+
+UNSAFE_HOME_ASSISTANT_INSTANCE_IDS = frozenset(
+    {"ha_980c4bd6a677da0511813adb8c98192e"}
+)
 
 RELAY_MODE_MANAGED = "managed"
 RELAY_MODE_CUSTOM = "custom"
@@ -31,6 +38,12 @@ WEBHOOK_PATH = f"/api/webhook/{WEBHOOK_ID}"
 
 HEADER_SIGNATURE = "X-HA-LiveKit-Signature"
 HEADER_SECRET = "X-HA-LiveKit-Secret"
+HEADER_TIMESTAMP = "X-HA-LiveKit-Timestamp"
+HEADER_NONCE = "X-HA-LiveKit-Nonce"
+
+WEBHOOK_MAX_CLOCK_SKEW_SECONDS = 300
+WEBHOOK_REPLAY_CACHE_TTL_SECONDS = 600
+WEBHOOK_REPLAY_CACHE_MAX_ENTRIES = 4096
 
 EVENT_ACTIVITY_REQUEST = "ha_livekit_activity_request"
 

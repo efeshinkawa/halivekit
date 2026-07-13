@@ -1,6 +1,6 @@
 set_activity:
   name: Set Live Activity
-  description: Recommended action. Starts a Live Activity if it does not exist, or updates the existing one with the same activity ID.
+  description: Recommended action. Starts a Live Activity if it does not exist, or updates the existing one with the same activity ID. Entity-backed calls follow Home Assistant entity read permissions. Limited users receive entity-derived content only; custom display overrides and entityless content require an administrator or a trusted automation/system context.
   fields:
     activity_id:
       name: Activity ID
@@ -111,7 +111,7 @@ set_activity:
 
 start_activity:
   name: Start Live Activity
-  description: Advanced action. Explicitly starts a custom Live Activity. Most users should use Set Live Activity instead.
+  description: Advanced raw/custom action for administrators and trusted automation/system contexts. Explicitly starts a custom Live Activity. Limited users should use Set Live Activity with an entity or Start Entity Live Activity.
   fields:
     activity_id:
       name: Activity ID
@@ -201,7 +201,7 @@ start_activity:
 
 start_entity_activity:
   name: Start Entity Live Activity
-  description: Advanced action. Explicitly starts a Live Activity from a Home Assistant entity. Most users should use Set Live Activity instead.
+  description: Advanced action. Explicitly starts a Live Activity from a Home Assistant entity. Most users should use Set Live Activity instead. Limited users receive entity-derived content only; custom display overrides require an administrator or a trusted automation/system context.
   fields:
     activity_id:
       name: Activity ID
@@ -298,7 +298,7 @@ start_entity_activity:
 
 update_activity:
   name: Update Live Activity
-  description: Advanced action. Explicitly updates an existing custom Live Activity. Most users should use Set Live Activity instead.
+  description: Advanced raw/custom action for administrators and trusted automation/system contexts. Explicitly updates an existing custom Live Activity. Limited users should use Set Live Activity with an entity or Update Entity Live Activity.
   fields:
     activity_id:
       name: Activity ID
@@ -385,7 +385,7 @@ update_activity:
 
 update_entity_activity:
   name: Update Entity Live Activity
-  description: Advanced action. Explicitly updates an entity-based Live Activity. Most users should use Set Live Activity instead.
+  description: Advanced action. Explicitly updates an entity-based Live Activity. Most users should use Set Live Activity instead. Limited users receive entity-derived content only; custom display overrides require an administrator or a trusted automation/system context.
   fields:
     activity_id:
       name: Activity ID
@@ -482,7 +482,7 @@ update_entity_activity:
 
 end_activity:
   name: End Live Activity
-  description: Ends an existing HA LiveKit Live Activity by activity ID.
+  description: Administrator or trusted automation/system action that ends an existing HA LiveKit Live Activity by activity ID.
   fields:
     activity_id:
       name: Activity ID
@@ -509,7 +509,7 @@ end_activity:
 
 configure_managed_relay:
   name: Internal Relay Setup
-  description: Internal admin-only setup used by the iOS app. You normally do not need to add this action manually.
+  description: Internal authenticated-admin-only setup used by the iOS app. Calls without a known administrator are rejected. You normally do not need to add this action manually.
   fields:
     relay_url:
       name: Managed relay URL

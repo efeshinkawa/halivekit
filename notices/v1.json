@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "notices": [
+    {
+      "id": "v2-hacs-integration-required",
+      "revision": 1,
+      "severity": "critical",
+      "title": "Update the HA LiveKit HACS integration",
+      "message": "HA LiveKit 2.0 requires the HA LiveKit 2.0 Home Assistant integration for secure relay pairing and relay device management. Open HACS, update HA LiveKit, restart Home Assistant, then reopen the iOS app. Existing foreground features and the temporary v1 compatibility path remain available during the rollout.",
+      "published_at": "2026-07-12T00:00:00Z",
+      "expires_at": "2027-12-31T23:59:59Z",
+      "minimum_app_version": "2.0.0",
+      "maximum_app_version": "2.0.99",
+      "action": "hacs_instructions"
+    }
+  ]
+}

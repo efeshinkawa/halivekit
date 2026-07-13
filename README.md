@@ -6,6 +6,8 @@ HA LiveKit connects Home Assistant automations to the HA LiveKit iOS app so your
 
 App Store: https://apps.apple.com/us/app/ha-livekit/id6769399254
 
+Read the complete [HA LiveKit 2.0 changelog](CHANGELOG.md).
+
 ## What it does
 
 Use Home Assistant services to create Live Activities for doors, laundry, lights, vacuums, energy usage, climate status, timers, and other entities. The iOS app listens for Home Assistant events while open and can also support background updates when the app has configured its relay connection.
@@ -21,10 +23,14 @@ Use Home Assistant services to create Live Activities for doors, laundry, lights
 
 ## Requirements
 
-- Home Assistant.
+- Home Assistant 2025.1 or newer.
 - HACS.
 - The HA LiveKit iOS app or TestFlight beta.
 - An iPhone that supports Live Activities.
+
+## Updating to 2.0
+
+Update HA LiveKit in HACS, restart Home Assistant, then reopen the iOS app. The older integration keeps existing foreground and compatibility flows available during rollout, but secure relay pairing, compatibility status, and administrator device management require both the iOS app and HACS integration to be on 2.0.
 
 ## Installation with HACS
 
@@ -35,7 +41,7 @@ Use Home Assistant services to create Live Activities for doors, laundry, lights
    `https://github.com/efeshinkawa/halivekit`
 
 4. Choose category: Integration.
-5. Install HA LiveKit.
+5. Install or update HA LiveKit.
 6. Restart Home Assistant.
 7. Go to Settings -> Devices & services -> Add Integration.
 8. Search for HA LiveKit and add it.
@@ -52,7 +58,7 @@ Keep your Long-Lived Access Token private. Do not paste it into automations, Git
 
 ### Optional: Internal and External URLs
 
-If you need different addresses on your home Wi-Fi and away from home (for example, NAT loopback or a local hostname), open the connection section in Settings and enable the optional Internal and External URL fields. When both are set, HA LiveKit tries the Internal URL first and falls back to the External URL only on connectivity errors. Authentication errors are not hidden. Existing single-URL setups keep working unchanged.
+If your Home Assistant uses different addresses on your home Wi-Fi and away from home, open the connection section in iOS Settings and enable the optional Internal and External URL fields. HA LiveKit tries the Internal URL first and falls back to the External URL only for connectivity failures. Authentication errors are never hidden, and existing single-URL setups continue to work.
 
 ## Automations
 

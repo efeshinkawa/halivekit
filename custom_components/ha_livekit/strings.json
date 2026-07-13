@@ -7,9 +7,13 @@
         "data": {
           "relay_enabled": "Background Live Activities",
           "relay_mode": "Relay mode",
+          "allow_legacy_webhook_secret": "Allow deprecated plaintext webhook secret (unsafe)",
           "relay_url": "Custom relay URL",
           "relay_shared_secret": "Custom relay shared secret",
           "relay_environment": "Relay environment"
+        },
+        "data_description": {
+          "allow_legacy_webhook_secret": "Disabled by default. Enable only while migrating an old webhook client that sends the shared secret directly; timestamped HMAC or the existing signed HMAC path should be used instead."
         }
       }
     },
@@ -24,9 +28,13 @@
         "data": {
           "relay_enabled": "Background Live Activities",
           "relay_mode": "Relay mode",
+          "allow_legacy_webhook_secret": "Allow deprecated plaintext webhook secret (unsafe)",
           "relay_url": "Custom relay URL",
           "relay_shared_secret": "Custom relay shared secret",
           "relay_environment": "Relay environment"
+        },
+        "data_description": {
+          "allow_legacy_webhook_secret": "Disabled by default. Enable only while migrating an old webhook client that sends the shared secret directly; timestamped HMAC or the existing signed HMAC path should be used instead."
         }
       }
     }
