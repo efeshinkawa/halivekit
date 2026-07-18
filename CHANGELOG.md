@@ -1,5 +1,18 @@
 # HA LiveKit Changelog
 
+## 2.0.1 — Background Shortcuts
+
+### Companion iOS app
+
+- Start Custom Live Activity and Start Entity Live Activity now use Apple's dedicated Live Activity intent contract.
+- Shortcuts and personal automations can start a Live Activity without presenting the HA LiveKit app interface.
+- Live Activities are still created immediately on the device through ActivityKit; the Home Assistant, relay, and APNs payload contracts are unchanged.
+
+### Home Assistant integration
+
+- No Home Assistant runtime behavior changed in this patch; the integration version is aligned with the 2.0.1 companion release.
+- HA LiveKit integration 2.0.0 remains compatible with the iOS 2.0.1 app.
+
 ## 2.0.0 — What’s New
 
 HA LiveKit 2.0 is a coordinated Home Assistant, managed-relay, and iOS upgrade focused on security, reliability, diagnostics, and a cleaner Live Activity workflow.
