@@ -1,12 +1,24 @@
 # HA LiveKit
 
-<p align="center"><img src="https://raw.githubusercontent.com/efeshinkawa/halivekit/main/logo.png" alt="HA LiveKit logo" width="320"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/efeshinkawa/halivekit/main/logo.png" alt="HA LiveKit logo" width="160"></p>
+
+<p align="center">
+  <a href="https://my.home-assistant.io/redirect/hacs_repository/?owner=efeshinkawa&amp;repository=halivekit&amp;category=integration"><img src="https://my.home-assistant.io/badges/hacs_repository.svg" alt="Open your Home Assistant instance and open a repository inside the Home Assistant Community Store."></a>
+</p>
 
 HA LiveKit connects Home Assistant automations to the HA LiveKit iOS app so your home can start, update, and end iPhone Live Activities.
 
-App Store: https://apps.apple.com/us/app/ha-livekit/id6769399254
+**App Store:** [Download HA LiveKit](https://go.efeer.im/halivekitapp)
 
-Read the complete [HA LiveKit 2.0 changelog](CHANGELOG.md).
+**Current versions:** iOS app **2.1** · HACS integration **2.0.1**
+
+Read the complete [HA LiveKit changelog](CHANGELOG.md).
+
+## What's new in 2.1
+
+HA LiveKit 2.1 adds optional, secure **On** and **Off** controls for `light`, `switch`, and `input_boolean` Live Activities. Controls work from the Lock Screen and expanded Dynamic Island, are opt-in, and require local device authentication.
+
+Version 2.1 updates only the iOS app and widget. It remains compatible with HACS integration 2.0.1, so no integration or relay update is required specifically for 2.1.
 
 ## What it does
 
@@ -15,6 +27,7 @@ Use Home Assistant services to create Live Activities for doors, laundry, lights
 ## Features
 
 - Start Live Activities from any Home Assistant automation.
+- Control supported lights, switches, and input booleans from the Lock Screen or expanded Dynamic Island.
 - Use entity-aware services that read friendly names, states, units, and progress values automatically.
 - Update or end an existing Live Activity by activity ID.
 - Works with Apple Shortcuts through the HA LiveKit iOS app.
@@ -25,17 +38,21 @@ Use Home Assistant services to create Live Activities for doors, laundry, lights
 
 - Home Assistant 2025.1 or newer.
 - HACS.
-- The HA LiveKit iOS app or TestFlight beta.
+- The HA LiveKit iOS app; version 2.1 is required for Live Activity action buttons.
 - An iPhone that supports Live Activities.
 
-## Updating to 2.0
+## Version compatibility
 
-Update HA LiveKit in HACS, restart Home Assistant, then reopen the iOS app. The older integration keeps existing foreground and compatibility flows available during rollout, but secure relay pairing, compatibility status, and administrator device management require both the iOS app and HACS integration to be on 2.0.
+HA LiveKit 2.1 for iOS works with HACS integration 2.0.1. If your integration is older than 2.0, update it in HACS, restart Home Assistant, and reopen the iOS app to complete the secure relay and diagnostics migration.
 
 ## Installation with HACS
 
+Use the **Add to HACS** button at the top of this page. It opens this repository in HACS and asks you to add it as a custom Integration. After the repository opens, choose **Download**; the button does not install the integration automatically.
+
+If the button cannot open your Home Assistant instance, add the repository manually:
+
 1. Open HACS in Home Assistant.
-2. Go to Custom repositories.
+2. Open Custom repositories.
 3. Add this repository URL:
 
    `https://github.com/efeshinkawa/halivekit`
