@@ -10,7 +10,7 @@ HA LiveKit connects Home Assistant automations to the HA LiveKit iOS app so your
 
 **App Store:** [Download HA LiveKit](https://go.efeer.im/halivekitapp)
 
-**Current versions:** iOS app **2.1** · HACS integration **2.1.0** (same 2.1 release line)
+**Current versions:** iOS app **2.1** · HACS integration **2.1.1** (same 2.1 release line)
 
 Read the complete [HA LiveKit changelog](CHANGELOG.md).
 
@@ -18,7 +18,7 @@ Read the complete [HA LiveKit changelog](CHANGELOG.md).
 
 HA LiveKit 2.1 adds optional, secure **On** and **Off** controls for `light`, `switch`, and `input_boolean` Live Activities. Controls work from the Lock Screen and expanded Dynamic Island, are opt-in, and require local device authentication.
 
-Version 2.1 aligns the iOS app and widget with HACS integration 2.1.0. The integration release updates its version reporting, documentation, and branding; Home Assistant services and the relay protocol are unchanged.
+HACS integration 2.1.1 restores background-delivery error reporting and adds the `allow_entity_control` option to Home Assistant activity services. Use it with iOS app 2.1 build 24 or newer.
 
 ## What it does
 
@@ -43,7 +43,7 @@ Use Home Assistant services to create Live Activities for doors, laundry, lights
 
 ## Version alignment
 
-Keep the iOS app and HACS integration on the same 2.1 release line. Update HA LiveKit to 2.1.0 in HACS, restart Home Assistant, and reopen the iOS app. Future public-repository syncs fail automatically if the app and integration release lines do not match.
+Keep the iOS app and HACS integration on the same 2.1 release line. Update HA LiveKit to 2.1.1 in HACS, restart Home Assistant, and reopen the iOS app. Patch versions may differ within the compatible 2.1 release line.
 
 ## Installation with HACS
 

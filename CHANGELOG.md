@@ -1,5 +1,21 @@
 # HA LiveKit Changelog
 
+## 2.1.1 — Background Delivery and Home Assistant Controls
+
+### Home Assistant integration
+
+- Adds `allow_entity_control` to `start_activity`, `set_activity`, and `start_entity_activity` so automations can explicitly enable authenticated On/Off controls.
+- Supports controls for `light`, `switch`, and `input_boolean` entities and rejects unsupported domains.
+- Reports enabled-relay delivery failures as actionable Home Assistant service errors instead of silently succeeding while the app is backgrounded or terminated.
+- Preserves foreground-only behavior when relay delivery is intentionally disabled.
+
+### Compatibility
+
+- Use HA LiveKit iOS 2.1 build 24 or newer.
+- Restart Home Assistant after updating the integration.
+- End and start a new Live Activity after changing `allow_entity_control`, because ActivityKit control permission is immutable for an existing activity.
+- Background action controls require a compatible managed-relay deployment; foreground delivery remains available independently.
+
 ## 2.1.0 — Live Activity Controls
 
 ### Companion iOS app
