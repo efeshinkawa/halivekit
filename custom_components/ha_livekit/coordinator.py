@@ -69,6 +69,7 @@ class DispatchResult:
 
     delivered_locally: bool
     delivered_outbound: bool
+    relay_enabled: bool
     relay_status_code: int | None = None
     relay_error: str | None = None
 
@@ -227,6 +228,7 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
         return DispatchResult(
             delivered_locally=True,
             delivered_outbound=delivered_outbound,
+            relay_enabled=relay_enabled,
             relay_status_code=self.last_relay_status_code,
             relay_error=relay_error,
         )

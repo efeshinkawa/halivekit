@@ -27,6 +27,7 @@ from .const import (
     ACTION_END,
     ACTION_START,
     ACTION_UPDATE,
+    ATTR_ALLOW_ENTITY_CONTROL,
     ATTR_ACTIVITY_ID,
     ATTR_DATA,
     ATTR_DEVICE_ID,
@@ -77,7 +78,11 @@ _APP_SECRET_HEADER = "X-HA-LiveKit-App-Secret"
 _DUPLICATE_ACTIVITY_NAME_ERROR = "duplicate_activity_name"
 _DUPLICATE_ACTIVITY_NAME_MESSAGE = "An active Live Activity with this name already exists. Please choose another name."
 _MAX_MANAGED_RELAY_RESPONSE_BYTES = 32 * 1024
+_ENTITY_CONTROL_ENTITY_PATTERN = re.compile(
+    r"^(?:light|switch|input_boolean)\.[a-z0-9_]{1,200}$"
+)
 _LIMITED_ENTITY_ACTIVITY_FIELDS = {
+    ATTR_ALLOW_ENTITY_CONTROL,
     ATTR_ACTIVITY_ID,
     ATTR_DEVICE_ID,
     ATTR_ENTITY_ID,
@@ -110,6 +115,7 @@ START_ACTIVITY_SCHEMA = vol.Schema(
         vol.Optional(ATTR_TEMPLATE, default="custom"): cv.string,
         vol.Optional(ATTR_STATE): cv.string,
         vol.Optional(ATTR_PROGRESS): vol.Coerce(float),
+        vol.Optional(ATTR_ALLOW_ENTITY_CONTROL): cv.boolean,
         vol.Optional(ATTR_DATA, default=dict): dict,
     }
 )
@@ -142,6 +148,7 @@ SET_ACTIVITY_SCHEMA = vol.Schema(
         vol.Optional(ATTR_PROGRESS): vol.Coerce(float),
         vol.Optional(ATTR_PROGRESS_ENTITY_ID): cv.entity_id,
         vol.Optional(ATTR_ICON_NAME): cv.string,
+        vol.Optional(ATTR_ALLOW_ENTITY_CONTROL): cv.boolean,
         vol.Optional(ATTR_END_WHEN): vol.Any(cv.string, dict),
         vol.Optional(ATTR_DATA, default=dict): dict,
     }
@@ -167,6 +174,7 @@ ENTITY_ACTIVITY_SCHEMA = vol.Schema(
         vol.Optional(ATTR_PROGRESS_ENTITY_ID): cv.entity_id,
         vol.Optional(ATTR_PROGRESS): vol.Coerce(float),
         vol.Optional(ATTR_ICON_NAME): cv.string,
+        vol.Optional(ATTR_ALLOW_ENTITY_CONTROL): cv.boolean,
         vol.Optional(ATTR_END_WHEN): vol.Any(cv.string, dict),
     }
 )
@@ -290,6 +298,7 @@ async def _handle_service(
     coordinator = _get_coordinator(hass)
     result = await coordinator.async_send_activity(action, payload)
     _raise_if_duplicate_activity_name_rejected(result)
+    _raise_if_background_delivery_failed(result)
 
 
 async def _handle_entity_service(
@@ -317,6 +326,7 @@ async def _handle_entity_service(
     coordinator = _get_coordinator(hass)
     result = await coordinator.async_send_activity(action, entity_payload)
     _raise_if_duplicate_activity_name_rejected(result)
+    _raise_if_background_delivery_failed(result)
 
 
 async def _handle_set_activity(
@@ -345,12 +355,14 @@ async def _handle_set_activity(
         coordinator = _get_coordinator(hass)
         result = await coordinator.async_send_activity(ACTION_START, entity_payload)
         _raise_if_duplicate_activity_name_rejected(result)
+        _raise_if_background_delivery_failed(result)
         return
 
     await _async_require_trusted_manual_activity_caller(hass, call)
     coordinator = _get_coordinator(hass)
     result = await coordinator.async_send_activity(ACTION_START, payload)
     _raise_if_duplicate_activity_name_rejected(result)
+    _raise_if_background_delivery_failed(result)
 
 
 async def _handle_configure_managed_relay(
@@ -520,6 +532,11 @@ def _require_safe_limited_entity_payload(
     """Prevent limited users from turning entity services into custom broadcasts."""
     if user is None or user.is_admin:
         return
+    if payload.get(ATTR_ALLOW_ENTITY_CONTROL) is True:
+        raise Unauthorized(
+            context=call.context,
+            user_id=getattr(call.context, "user_id", None),
+        )
     disallowed_fields = set(payload) - _LIMITED_ENTITY_ACTIVITY_FIELDS
     if disallowed_fields == {ATTR_DATA} and payload.get(ATTR_DATA) == {}:
         disallowed_fields.clear()
@@ -570,6 +587,13 @@ def _validate_activity_service_payload(payload: dict[str, Any]) -> None:
         validate_activity_payload(payload)
     except PayloadValidationError as err:
         raise HomeAssistantError(f"Invalid HA LiveKit activity payload ({err.code})") from err
+
+    if payload.get(ATTR_ALLOW_ENTITY_CONTROL) is True:
+        entity_id = str(payload.get(ATTR_ENTITY_ID) or "").strip()
+        if not _ENTITY_CONTROL_ENTITY_PATTERN.fullmatch(entity_id):
+            raise HomeAssistantError(
+                "Live Activity controls require a light, switch, or input_boolean entity"
+            )
 
 
 async def _async_provision_managed_relay_secret(
@@ -682,7 +706,7 @@ def _get_coordinator(hass: HomeAssistant) -> HALiveKitCoordinator:
 
 
 def _raise_if_duplicate_activity_name_rejected(result: Any) -> None:
-    """Surface explicit duplicate-name relay rejections without changing relay-outage tolerance."""
+    """Surface an explicit duplicate-name relay rejection."""
     if result is None:
         return
 
@@ -690,6 +714,25 @@ def _raise_if_duplicate_activity_name_rejected(result: Any) -> None:
     relay_error = str(getattr(result, "relay_error", "") or "")
     if relay_status_code == 409 and _DUPLICATE_ACTIVITY_NAME_ERROR in relay_error:
         raise HomeAssistantError(_DUPLICATE_ACTIVITY_NAME_MESSAGE)
+
+
+def _raise_if_background_delivery_failed(result: Any) -> None:
+    """Fail a relay-required service call when no outbound delivery occurred."""
+    if result is None or not bool(getattr(result, "relay_enabled", False)):
+        return
+    if bool(getattr(result, "delivered_outbound", False)):
+        return
+
+    relay_status_code = getattr(result, "relay_status_code", None)
+    status_detail = (
+        f" Relay returned HTTP {relay_status_code}."
+        if isinstance(relay_status_code, int)
+        else " The relay could not be reached or is not fully configured."
+    )
+    raise HomeAssistantError(
+        "Background Live Activity delivery failed."
+        f"{status_detail} Check HA LiveKit relay diagnostics and reopen the iOS app if setup is incomplete."
+    )
 
 
 def _valid_home_assistant_instance_id(value: str) -> bool:

@@ -9,6 +9,7 @@ from typing import Any
 from homeassistant.core import HomeAssistant, State
 
 from .const import (
+    ATTR_ALLOW_ENTITY_CONTROL,
     ATTR_ACTIVITY_ID,
     ATTR_DEVICE_ID,
     ATTR_DISPLAY_NAME,
@@ -111,6 +112,8 @@ def build_entity_activity_payload(
         result[ATTR_PROGRESS] = progress
     if device_id := _clean_string(payload.get(ATTR_DEVICE_ID)):
         result[ATTR_DEVICE_ID] = device_id
+    if ATTR_ALLOW_ENTITY_CONTROL in payload:
+        result[ATTR_ALLOW_ENTITY_CONTROL] = payload[ATTR_ALLOW_ENTITY_CONTROL] is True
     if end_when := payload.get(ATTR_END_WHEN):
         result["data"]["end_when"] = end_when
 

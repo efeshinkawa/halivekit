@@ -67,6 +67,7 @@ ATTR_STATE = "state"
 ATTR_PROGRESS = "progress"
 ATTR_PROGRESS_ENTITY_ID = "progress_entity_id"
 ATTR_ICON_NAME = "icon_name"
+ATTR_ALLOW_ENTITY_CONTROL = "allow_entity_control"
 ATTR_REASON = "reason"
 ATTR_END_WHEN = "end_when"
 

@@ -16,6 +16,13 @@ set_activity:
       example: binary_sensor.front_door
       selector:
         entity:
+    allow_entity_control:
+      name: Show On/Off controls
+      description: Opt in to On and Off buttons for a light, switch, or input_boolean. The iOS app must remain connected to this Home Assistant instance. Applies when a new Live Activity starts; end and restart an existing activity to change this setting. Administrator or trusted automation/system context required.
+      required: false
+      default: false
+      selector:
+        boolean:
     template:
       name: Template
       description: Visual template hint. Leave empty to infer from the entity when possible.
@@ -127,6 +134,13 @@ start_activity:
       example: binary_sensor.front_door
       selector:
         entity:
+    allow_entity_control:
+      name: Show On/Off controls
+      description: Opt in to On and Off buttons for a light, switch, or input_boolean. The iOS app must remain connected to this Home Assistant instance. Applies only when this call starts a new Live Activity. Administrator or trusted automation/system context required.
+      required: false
+      default: false
+      selector:
+        boolean:
     title:
       name: Title
       description: Live Activity heading, e.g. Door Alert or Laundry.
@@ -217,6 +231,13 @@ start_entity_activity:
       example: binary_sensor.front_door
       selector:
         entity:
+    allow_entity_control:
+      name: Show On/Off controls
+      description: Opt in to On and Off buttons for a light, switch, or input_boolean. The iOS app must remain connected to this Home Assistant instance. Applies when a new Live Activity starts; end and restart an existing activity to change this setting. Administrator or trusted automation/system context required.
+      required: false
+      default: false
+      selector:
+        boolean:
     template:
       name: Template
       description: Optional visual template hint. Leave empty to infer from the entity domain and device class.
