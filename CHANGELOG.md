@@ -1,6 +1,6 @@
 # HA LiveKit Changelog
 
-## 2.1 — Live Activity Controls
+## 2.1.0 — Live Activity Controls
 
 ### Companion iOS app
 
@@ -10,11 +10,17 @@
 - Uses the selected entity's Home Assistant or SF Symbol mapping for custom activities.
 - Removes the redundant zero-brightness progress bar from control-enabled Dynamic Island layouts.
 
+### Home Assistant integration
+
+- Aligns the integration manifest and status version with the HA LiveKit 2.1 app release.
+- Restores transparent integration branding and refreshes the HACS installation entry point.
+- Keeps Home Assistant services, payloads, and the relay protocol unchanged.
+
 ### Compatibility
 
 - Action buttons are opt-in and disabled by default.
-- HA LiveKit 2.1 is an iOS app and widget update; the HACS integration remains at 2.0.1.
-- No backend, relay protocol, entitlement, bundle identifier, or Home Assistant integration update is required.
+- HA LiveKit 2.1 and HACS integration 2.1.0 are the same coordinated release line.
+- No backend, relay protocol, entitlement, or bundle identifier changes are required.
 - Existing Live Activities remain compatible because the new control attributes are optional.
 
 ## 2.0.1 — Background Shortcuts

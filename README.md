@@ -1,6 +1,6 @@
 # HA LiveKit
 
-<p align="center"><img src="https://raw.githubusercontent.com/efeshinkawa/halivekit/main/logo.png" alt="HA LiveKit logo" width="160"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/efeshinkawa/halivekit/157a26442f64e4ba907423e517bb3c1ad44322ee/logo.png" alt="HA LiveKit logo" width="160"></p>
 
 <p align="center">
   <a href="https://my.home-assistant.io/redirect/hacs_repository/?owner=efeshinkawa&amp;repository=halivekit&amp;category=integration"><img src="https://my.home-assistant.io/badges/hacs_repository.svg" alt="Open your Home Assistant instance and open a repository inside the Home Assistant Community Store."></a>
@@ -10,7 +10,7 @@ HA LiveKit connects Home Assistant automations to the HA LiveKit iOS app so your
 
 **App Store:** [Download HA LiveKit](https://go.efeer.im/halivekitapp)
 
-**Current versions:** iOS app **2.1** · HACS integration **2.0.1**
+**Current versions:** iOS app **2.1** · HACS integration **2.1.0** (same 2.1 release line)
 
 Read the complete [HA LiveKit changelog](CHANGELOG.md).
 
@@ -18,7 +18,7 @@ Read the complete [HA LiveKit changelog](CHANGELOG.md).
 
 HA LiveKit 2.1 adds optional, secure **On** and **Off** controls for `light`, `switch`, and `input_boolean` Live Activities. Controls work from the Lock Screen and expanded Dynamic Island, are opt-in, and require local device authentication.
 
-Version 2.1 updates only the iOS app and widget. It remains compatible with HACS integration 2.0.1, so no integration or relay update is required specifically for 2.1.
+Version 2.1 aligns the iOS app and widget with HACS integration 2.1.0. The integration release updates its version reporting, documentation, and branding; Home Assistant services and the relay protocol are unchanged.
 
 ## What it does
 
@@ -41,9 +41,9 @@ Use Home Assistant services to create Live Activities for doors, laundry, lights
 - The HA LiveKit iOS app; version 2.1 is required for Live Activity action buttons.
 - An iPhone that supports Live Activities.
 
-## Version compatibility
+## Version alignment
 
-HA LiveKit 2.1 for iOS works with HACS integration 2.0.1. If your integration is older than 2.0, update it in HACS, restart Home Assistant, and reopen the iOS app to complete the secure relay and diagnostics migration.
+Keep the iOS app and HACS integration on the same 2.1 release line. Update HA LiveKit to 2.1.0 in HACS, restart Home Assistant, and reopen the iOS app. Future public-repository syncs fail automatically if the app and integration release lines do not match.
 
 ## Installation with HACS
 
