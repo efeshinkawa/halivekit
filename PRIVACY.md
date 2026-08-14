@@ -20,7 +20,9 @@ HA LiveKit can read Home Assistant entity names, states, units, and progress val
 
 ## Diagnostics
 
-HA LiveKit may show local diagnostics to help troubleshoot connection and background update issues. Diagnostics are designed to avoid exposing full tokens or secrets. You should still avoid sharing screenshots or logs that may contain private URLs or Home Assistant details.
+HA LiveKit may show local diagnostics to help troubleshoot connection and background update issues. Diagnostics are designed to avoid exposing full tokens or secrets. You should still avoid sharing screenshots or copied diagnostics that may contain private Home Assistant details.
+
+When you contact support from the app, diagnostic logs are off by default. If you explicitly turn on **Send Logs**, HA LiveKit creates an in-memory attachment containing only fixed event categories, outcomes, repetition counts, and HTTP status codes from the current app session. Raw messages, timestamps, names, identifiers, URLs, IP addresses, credentials, server responses, and error details are excluded. The attachment is shown in an email draft for your approval and is never sent automatically. HA LiveKit does not persist or sync the attachment; if you save or send the draft, your configured Mail service may store or sync the draft or message under its own policies.
 
 ## Data sharing
 
@@ -30,4 +32,4 @@ HA LiveKit does not sell user data. HA LiveKit does not use user data for third-
 
 For privacy questions, contact:
 
-erimefe@efeyesoylegelsin.com
+support@efeer.im
