@@ -69,7 +69,10 @@ from .const import (
 from .coordinator import HALiveKitCoordinator
 from .entity_activity import build_entity_activity_payload
 from .pairing import async_register_pairing_view
-from .security import PayloadValidationError, validate_activity_payload
+from .security import (
+    PayloadValidationError,
+    validate_routable_activity_payload,
+)
 from .webhook import async_register_webhook
 
 _LOGGER = logging.getLogger(__name__)
@@ -77,6 +80,29 @@ _SERVICES_REGISTERED = "_services_registered"
 _APP_SECRET_HEADER = "X-HA-LiveKit-App-Secret"
 _DUPLICATE_ACTIVITY_NAME_ERROR = "duplicate_activity_name"
 _DUPLICATE_ACTIVITY_NAME_MESSAGE = "An active Live Activity with this name already exists. Please choose another name."
+_AMBIGUOUS_ENTITY_ACTIVITY_ERROR = "ambiguous_entity_activity"
+_IMMUTABLE_ACTIVITY_ATTRIBUTES_ERROR = "immutable_activity_attributes_changed"
+_ACTIVITY_RESTART_REQUIRED_ERROR = "activity_restart_required"
+_ENTITY_ACTIVITY_ID_CHANGED_ERROR = "entity_activity_id_changed"
+_PENDING_ENTITY_ACTIVITY_ID_CHANGED_ERROR = "pending_entity_activity_id_changed"
+_AMBIGUOUS_ENTITY_ACTIVITY_MESSAGE = (
+    "More than one Live Activity ID is already associated with this entity. "
+    "End the extra activities, then retry."
+)
+_ACTIVITY_RESTART_REQUIRED_MESSAGE = (
+    "Live Activity controls and other start settings cannot change while an activity is running. "
+    "End the existing activity and start it again."
+)
+_ENTITY_ACTIVITY_ID_CHANGED_MESSAGE = (
+    "This entity already has a Live Activity under a different Activity ID. "
+    "End the existing activity, then start it again with the new ID."
+)
+_PENDING_ENTITY_ACTIVITY_ID_CHANGED_MESSAGE = (
+    "A previous Live Activity start for this entity is still pending. "
+    "Open HA LiveKit on the target iPhone and wait for registration to finish, "
+    "then end the previous Activity ID and retry. If it never registers, wait "
+    "for the pending request to expire."
+)
 _PENDING_ACTIVITY_TOKEN_ERROR = "Live Activity start is still pending on the device"
 _PENDING_ACTIVITY_TOKEN_MESSAGE = (
     "The iPhone is still registering this Live Activity for background updates. "
@@ -591,7 +617,7 @@ async def _async_require_trusted_manual_activity_caller(
 def _validate_activity_service_payload(payload: dict[str, Any]) -> None:
     """Translate boundary validation failures into safe HA service errors."""
     try:
-        validate_activity_payload(payload)
+        validate_routable_activity_payload(payload)
     except PayloadValidationError as err:
         raise HomeAssistantError(f"Invalid HA LiveKit activity payload ({err.code})") from err
 
@@ -713,7 +739,7 @@ def _get_coordinator(hass: HomeAssistant) -> HALiveKitCoordinator:
 
 
 def _raise_if_duplicate_activity_name_rejected(result: Any) -> None:
-    """Surface an explicit duplicate-name relay rejection."""
+    """Surface actionable relay conflicts before the generic delivery error."""
     if result is None:
         return
 
@@ -721,6 +747,20 @@ def _raise_if_duplicate_activity_name_rejected(result: Any) -> None:
     relay_error = str(getattr(result, "relay_error", "") or "")
     if relay_status_code == 409 and _DUPLICATE_ACTIVITY_NAME_ERROR in relay_error:
         raise HomeAssistantError(_DUPLICATE_ACTIVITY_NAME_MESSAGE)
+    if relay_status_code == 409 and _AMBIGUOUS_ENTITY_ACTIVITY_ERROR in relay_error:
+        raise HomeAssistantError(_AMBIGUOUS_ENTITY_ACTIVITY_MESSAGE)
+    if relay_status_code == 409 and (
+        _IMMUTABLE_ACTIVITY_ATTRIBUTES_ERROR in relay_error
+        or _ACTIVITY_RESTART_REQUIRED_ERROR in relay_error
+    ):
+        raise HomeAssistantError(_ACTIVITY_RESTART_REQUIRED_MESSAGE)
+    if (
+        relay_status_code == 409
+        and _PENDING_ENTITY_ACTIVITY_ID_CHANGED_ERROR in relay_error
+    ):
+        raise HomeAssistantError(_PENDING_ENTITY_ACTIVITY_ID_CHANGED_MESSAGE)
+    if relay_status_code == 409 and _ENTITY_ACTIVITY_ID_CHANGED_ERROR in relay_error:
+        raise HomeAssistantError(_ENTITY_ACTIVITY_ID_CHANGED_MESSAGE)
 
 
 def _raise_if_background_delivery_failed(result: Any) -> None:

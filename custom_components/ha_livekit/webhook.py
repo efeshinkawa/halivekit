@@ -29,7 +29,7 @@ from .coordinator import (
 from .security import (
     MAX_WEBHOOK_BODY_BYTES,
     PayloadValidationError,
-    validate_activity_payload,
+    validate_routable_activity_payload,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -82,7 +82,7 @@ def async_register_webhook(
             return web.json_response({"ok": False, "error": "unauthorized"}, status=401)
 
         try:
-            validate_activity_payload(payload)
+            validate_routable_activity_payload(payload)
         except PayloadValidationError as err:
             return web.json_response({"ok": False, "error": err.code}, status=400)
 

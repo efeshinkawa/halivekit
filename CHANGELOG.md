@@ -1,5 +1,19 @@
 # HA LiveKit Changelog
 
+## 2.1.3 — Stable Background Activity Routing
+
+### Home Assistant integration
+
+- Routes activity IDs containing Unicode characters through a reversible, collision-safe relay identity while preserving existing valid ASCII IDs unchanged.
+- Rejects an entity-backed `set_activity` call that changes the ID of an active or pending activity with actionable end-and-restart guidance, preventing foreground and background delivery from diverging.
+- Treats stale APNs registrations and other zero-delivery relay results as delivery failures instead of reporting false success.
+
+### Compatibility
+
+- Existing valid ASCII activity IDs, YAML automations, v1 relay registrations, and current device registrations remain compatible.
+- HA LiveKit iOS remains at 2.1.1; no companion app update is required for this HACS patch.
+- To change an existing activity's ID or immutable controls, end the activity and start it again.
+
 ## 2.1.2 — Reliable Repeated Background Starts
 
 ### Home Assistant integration

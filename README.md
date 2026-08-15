@@ -10,7 +10,7 @@ HA LiveKit connects Home Assistant automations to the HA LiveKit iOS app so your
 
 **App Store:** [Download HA LiveKit](https://go.efeer.im/halivekitapp)
 
-**Current versions:** iOS app **2.1.1** · HACS integration **2.1.2** (same 2.1 release line)
+**Current versions:** iOS app **2.1.1** · HACS integration **2.1.3** (same 2.1 release line)
 
 Read the complete [HA LiveKit changelog](CHANGELOG.md).
 
@@ -18,7 +18,7 @@ Read the complete [HA LiveKit changelog](CHANGELOG.md).
 
 HA LiveKit 2.1 adds optional, secure **On** and **Off** controls for `light`, `switch`, and `input_boolean` Live Activities. Controls work from the Lock Screen and expanded Dynamic Island, are opt-in, and require local device authentication.
 
-The coordinated HACS 2.1.2 and latest iOS 2.1.1 build make repeated background starts recover reliably. The integration also replaces the confusing optional-field checkbox plus boolean with one real control switch and derives a stable activity ID when an entity-backed `set_activity` call leaves it empty.
+HACS 2.1.3 makes foreground and background activity routing agree: Unicode activity IDs use collision-safe relay identities, existing valid ASCII IDs stay unchanged, and an entity-backed activity whose ID changes returns clear end-and-restart guidance. It also reports stale APNs registrations and other zero-delivery results as failures instead of false success. The companion iOS app remains at 2.1.1.
 
 ## What it does
 
@@ -43,7 +43,7 @@ Use Home Assistant services to create Live Activities for doors, laundry, lights
 
 ## Version alignment
 
-Keep the iOS app and HACS integration on the same 2.1 release line. Update HA LiveKit to 2.1.2 in HACS, restart Home Assistant, and reopen the iOS app. Patch versions may differ within the compatible 2.1 release line.
+Keep the iOS app and HACS integration on the same 2.1 release line. Update HA LiveKit to 2.1.3 in HACS and restart Home Assistant. The compatible iOS app remains at 2.1.1, so no companion app update is required. Patch versions may differ within the compatible 2.1 release line.
 
 ## Installation with HACS
 
@@ -84,6 +84,8 @@ Most users should use `ha_livekit.set_activity`.
 - It starts the Live Activity if it does not exist.
 - It updates the existing Live Activity if it already exists.
 - When an entity is selected, `activity_id` may be left empty and HA LiveKit derives a stable ID so repeated calls update the same activity.
+- Existing valid ASCII activity IDs are preserved; Unicode activity IDs are supported through collision-safe background routing.
+- Do not change the ID of an active entity-backed activity. End it first, then start it again with the new ID.
 - For custom calls without an entity, provide an explicit `activity_id`.
 - If two entities in different domains share the same object ID, provide distinct explicit IDs for them (for example, `light_desk` and `switch_desk`).
 

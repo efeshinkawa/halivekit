@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import base64
 import json
 import math
+import re
 from typing import Any
 
 
@@ -13,6 +15,9 @@ MAX_PAYLOAD_DEPTH = 8
 MAX_PAYLOAD_ITEMS = 512
 MAX_MAPPING_KEY_LENGTH = 128
 MAX_GENERIC_STRING_LENGTH = 4096
+MAX_ACTIVITY_ID_LENGTH = 128
+
+_LEGACY_ACTIVITY_ROUTING_ID_PATTERN = re.compile(r"[A-Za-z0-9._-]{1,128}")
 
 _FIELD_STRING_LIMITS = {
     "action": 64,
@@ -61,6 +66,48 @@ class PayloadValidationError(ValueError):
         self.code = code
 
 
+def canonicalize_activity_routing_id(value: str) -> str:
+    """Encode one raw HA identifier without colliding with legacy-safe values.
+
+    This is intentionally a raw-input transform, not an idempotent protocol-ID
+    normalizer. Only the historical ASCII domain is preserved byte-for-byte;
+    every other raw value (including strings beginning with ``~``) is encoded.
+    Callers must invoke it exactly once at the HA dispatch boundary.
+    """
+    normalized = value.strip()
+    if not normalized:
+        raise PayloadValidationError("activity_id_not_routable")
+    if _LEGACY_ACTIVITY_ROUTING_ID_PATTERN.fullmatch(normalized):
+        return normalized
+
+    try:
+        raw = normalized.encode("utf-8")
+    except UnicodeEncodeError as err:
+        raise PayloadValidationError("activity_id_not_utf8") from err
+    encoded = "~" + base64.urlsafe_b64encode(raw).decode("ascii").rstrip("=")
+    if len(encoded) > MAX_ACTIVITY_ID_LENGTH:
+        raise PayloadValidationError("activity_id_not_routable")
+    return encoded
+
+
+def canonicalize_activity_id_fields(payload: dict[str, Any]) -> None:
+    """Canonicalize supported activity ID spellings in place."""
+    for key in ("activity_id", "activityId"):
+        value = payload.get(key)
+        if isinstance(value, str) and value:
+            payload[key] = canonicalize_activity_routing_id(value)
+
+
+def validate_routable_activity_payload(payload: Any) -> None:
+    """Validate the eventual routed payload without mutating caller data."""
+    if not isinstance(payload, dict):
+        validate_activity_payload(payload)
+        return
+    validation_payload = dict(payload)
+    canonicalize_activity_id_fields(validation_payload)
+    validate_activity_payload(validation_payload)
+
+
 def validate_activity_payload(payload: Any) -> None:
     """Validate shape, depth and encoded size without mutating the payload."""
     if not isinstance(payload, dict):
@@ -76,7 +123,7 @@ def validate_activity_payload(payload: Any) -> None:
             allow_nan=False,
             separators=(",", ":"),
         ).encode("utf-8")
-    except (TypeError, ValueError, OverflowError) as err:
+    except (TypeError, ValueError, OverflowError, UnicodeError) as err:
         raise PayloadValidationError("payload_not_json_safe") from err
 
     if len(encoded) > MAX_ACTIVITY_PAYLOAD_BYTES:

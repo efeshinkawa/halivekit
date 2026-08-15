@@ -47,11 +47,22 @@ from .const import (
     WEBHOOK_REPLAY_CACHE_TTL_SECONDS,
     UNSAFE_HOME_ASSISTANT_INSTANCE_IDS,
 )
+from .security import canonicalize_activity_id_fields
 
 _LOGGER = logging.getLogger(__name__)
 _WEBHOOK_NONCE_PATTERN = re.compile(r"[A-Za-z0-9._~-]{16,128}")
 _WEBHOOK_SIGNATURE_PATTERN = re.compile(r"(?:sha256=)?[a-f0-9]{64}")
 _MAX_RELAY_RESPONSE_BYTES = 32 * 1024
+_SEMANTIC_ENTITY_RELAY_ERRORS = frozenset(
+    {
+        "ambiguous_entity_activity",
+        "duplicate_activity_name",
+        "entity_activity_id_changed",
+        "pending_entity_activity_id_changed",
+        "immutable_activity_attributes_changed",
+        "activity_restart_required",
+    }
+)
 
 WEBHOOK_AUTH_OK = "ok"
 WEBHOOK_AUTH_OK_LEGACY_SIGNATURE = "ok_legacy_signature"
@@ -87,6 +98,7 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
         self.last_relay_status_code: int | None = None
         self.last_relay_response: str | None = None
         self.last_relay_error: str | None = None
+        self.last_relay_error_code: str | None = None
         self._webhook_replay_cache: dict[str, float] = {}
         self._legacy_webhook_warning_logged = False
 
@@ -196,17 +208,14 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
     ) -> DispatchResult:
         """Publish an activity request inside HA and optionally to a relay endpoint."""
         message = self._normalize_message(action, payload)
-        self.async_set_updated_data(message)
-        self.hass.bus.async_fire(EVENT_ACTIVITY_REQUEST, message)
-        _LOGGER.debug(
-            "HA LiveKit foreground event bus fired for %s activity_id=%s",
-            message.get("action"),
-            message.get("activity_id"),
-        )
-
         delivered_outbound = False
         relay_error = None
         relay_enabled = self.relay_enabled
+        defer_local_publish = relay_enabled and _is_entity_backed_set_message(message)
+        delivered_locally = False
+        if not defer_local_publish:
+            self._publish_local(message)
+            delivered_locally = True
         relay_url = self.relay_url.strip()
         _LOGGER.debug(
             "HA LiveKit relay forwarding state: enabled=%s mode=%s relay_url_present=%s activity_id=%s action=%s",
@@ -225,8 +234,24 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
             self.last_relay_error = "Relay forwarding disabled"
             _LOGGER.debug("HA LiveKit background relay forwarding disabled; foreground event bus only")
 
+        semantic_rejection = (
+            defer_local_publish
+            and not delivered_outbound
+            and self.last_relay_status_code == 409
+            and self.last_relay_error_code in _SEMANTIC_ENTITY_RELAY_ERRORS
+        )
+        if defer_local_publish and not semantic_rejection:
+            self._publish_local(message)
+            delivered_locally = True
+        elif semantic_rejection:
+            _LOGGER.warning(
+                "HA LiveKit withheld foreground event after relay semantic rejection: error=%s activity_id=%s",
+                self.last_relay_error_code,
+                message.get("activity_id"),
+            )
+
         return DispatchResult(
-            delivered_locally=True,
+            delivered_locally=delivered_locally,
             delivered_outbound=delivered_outbound,
             relay_enabled=relay_enabled,
             relay_status_code=self.last_relay_status_code,
@@ -375,13 +400,25 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
 
     def _normalize_message(self, action: str, payload: dict[str, Any]) -> dict[str, Any]:
         normalized_action = self._normalize_action(action)
-        return {
+        message = {
             "version": 1,
             "domain": DOMAIN,
             "timestamp": datetime.now(UTC).isoformat(),
             **payload,
             "action": normalized_action,
         }
+        canonicalize_activity_id_fields(message)
+        return message
+
+    def _publish_local(self, message: dict[str, Any]) -> None:
+        """Publish one foreground event after any required relay preflight."""
+        self.async_set_updated_data(message)
+        self.hass.bus.async_fire(EVENT_ACTIVITY_REQUEST, message)
+        _LOGGER.debug(
+            "HA LiveKit foreground event bus fired for %s activity_id=%s",
+            message.get("action"),
+            message.get("activity_id"),
+        )
 
     @staticmethod
     def _normalize_action(action: str) -> str:
@@ -403,6 +440,7 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
         self.last_relay_status_code = None
         self.last_relay_response = None
         self.last_relay_error = None
+        self.last_relay_error_code = None
 
         if not relay_url:
             if self.relay_mode == RELAY_MODE_MANAGED:
@@ -499,6 +537,7 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
                     return False
                 self.last_relay_response = _safe_response_summary(text)
                 if response.status >= 400:
+                    self.last_relay_error_code = _relay_error_code(text)
                     self.last_relay_error = f"HTTP {response.status}: {self.last_relay_response}"
                     _LOGGER.warning(
                         "HA LiveKit relay POST status: endpoint=%s status=%s response=%s",
@@ -543,6 +582,34 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
             return False
 
         return True
+
+
+def _is_entity_backed_set_message(message: dict[str, Any]) -> bool:
+    """Return whether relay semantics must be known before local publication."""
+    data = message.get("data")
+    entity_id = message.get("entity_id")
+    return (
+        message.get("action") == ACTION_START
+        and isinstance(data, dict)
+        and data.get("entity_based") is True
+        and data.get("source_service") == "set_activity"
+        and isinstance(entity_id, str)
+        and bool(entity_id.strip())
+    )
+
+
+def _relay_error_code(text: str) -> str | None:
+    """Extract one bounded relay error code without trusting free-form text."""
+    try:
+        payload = json.loads(text)
+    except (TypeError, json.JSONDecodeError):
+        return None
+    if not isinstance(payload, dict):
+        return None
+    error = payload.get("error")
+    if not isinstance(error, str) or not re.fullmatch(r"[a-z0-9_]{1,64}", error):
+        return None
+    return error
 
 
 async def _async_read_limited_stream(source: Any, limit: int) -> bytes | None:
