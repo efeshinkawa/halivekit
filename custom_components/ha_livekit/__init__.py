@@ -77,6 +77,11 @@ _SERVICES_REGISTERED = "_services_registered"
 _APP_SECRET_HEADER = "X-HA-LiveKit-App-Secret"
 _DUPLICATE_ACTIVITY_NAME_ERROR = "duplicate_activity_name"
 _DUPLICATE_ACTIVITY_NAME_MESSAGE = "An active Live Activity with this name already exists. Please choose another name."
+_PENDING_ACTIVITY_TOKEN_ERROR = "Live Activity start is still pending on the device"
+_PENDING_ACTIVITY_TOKEN_MESSAGE = (
+    "The iPhone is still registering this Live Activity for background updates. "
+    "Reopen HA LiveKit once if needed, wait a moment, then retry."
+)
 _MAX_MANAGED_RELAY_RESPONSE_BYTES = 32 * 1024
 _ENTITY_CONTROL_ENTITY_PATTERN = re.compile(
     r"^(?:light|switch|input_boolean)\.[a-z0-9_]{1,200}$"
@@ -138,7 +143,7 @@ UPDATE_ACTIVITY_SCHEMA = vol.Schema(
 SET_ACTIVITY_SCHEMA = vol.Schema(
     {
         vol.Optional(ATTR_DEVICE_ID): cv.string,
-        vol.Required(ATTR_ACTIVITY_ID): cv.string,
+        vol.Optional(ATTR_ACTIVITY_ID): cv.string,
         vol.Optional(ATTR_ENTITY_ID): cv.entity_id,
         vol.Optional(ATTR_TITLE): cv.string,
         vol.Optional(ATTR_DISPLAY_NAME): cv.string,
@@ -359,6 +364,8 @@ async def _handle_set_activity(
         return
 
     await _async_require_trusted_manual_activity_caller(hass, call)
+    if not str(payload.get(ATTR_ACTIVITY_ID, "")).strip():
+        raise HomeAssistantError("Activity ID is required when Entity is omitted")
     coordinator = _get_coordinator(hass)
     result = await coordinator.async_send_activity(ACTION_START, payload)
     _raise_if_duplicate_activity_name_rejected(result)
@@ -724,6 +731,12 @@ def _raise_if_background_delivery_failed(result: Any) -> None:
         return
 
     relay_status_code = getattr(result, "relay_status_code", None)
+    relay_error = str(getattr(result, "relay_error", "") or "")
+    if _PENDING_ACTIVITY_TOKEN_ERROR in relay_error:
+        raise HomeAssistantError(
+            "Background Live Activity delivery is still pending. "
+            f"{_PENDING_ACTIVITY_TOKEN_MESSAGE}"
+        )
     status_detail = (
         f" Relay returned HTTP {relay_status_code}."
         if isinstance(relay_status_code, int)

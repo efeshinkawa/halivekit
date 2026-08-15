@@ -1,5 +1,24 @@
 # HA LiveKit Changelog
 
+## 2.1.2 — Reliable Repeated Background Starts
+
+### Home Assistant integration
+
+- Shows one real **On/Off controls** switch in the Home Assistant action editor while keeping the runtime field optional for existing YAML automations.
+- Lets entity-backed `set_activity` calls omit `activity_id` and derives the same stable ID on every call, preventing accidental duplicate Live Activities; custom calls without an entity still require an explicit ID.
+- Reports a relay start that is still waiting for the iPhone activity token as an actionable delivery error instead of a false success.
+
+### Companion iOS app
+
+- Ignores the foreground WebSocket duplicate while the app is inactive or backgrounded, preventing the delayed `Target is not foreground` alert.
+- Restarts per-activity token observation after Home Assistant identity restore or switching connections, so repeated background start, update, and end requests can recover reliably.
+
+### Compatibility
+
+- Existing YAML automations, explicit activity IDs, v1 relay registrations, and current Live Activities remain compatible.
+- Action controls remain opt-in and disabled by default.
+- Use HA LiveKit iOS 2.1.1 with HACS integration 2.1.2, restart Home Assistant, and reopen the iOS app once after updating.
+
 ## 2.1.1 — Background Delivery and Home Assistant Controls
 
 ### Home Assistant integration

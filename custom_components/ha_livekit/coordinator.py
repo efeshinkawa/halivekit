@@ -507,6 +507,30 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
                         self.last_relay_response,
                     )
                     return False
+                if action == ACTION_START:
+                    try:
+                        relay_result = json.loads(text)
+                    except json.JSONDecodeError:
+                        relay_result = None
+                    if (
+                        isinstance(relay_result, dict)
+                        and relay_result.get("attempted") == 0
+                        and relay_result.get("delivered") == 0
+                        and isinstance(relay_result.get("reused_pending"), int)
+                        and not isinstance(relay_result.get("reused_pending"), bool)
+                        and relay_result["reused_pending"] > 0
+                    ):
+                        self.last_relay_error = (
+                            "Live Activity start is still pending on the device; "
+                            "wait for the iOS app to register its activity update token, then retry"
+                        )
+                        _LOGGER.warning(
+                            "HA LiveKit relay start still pending: endpoint=%s status=%s response=%s",
+                            action,
+                            response.status,
+                            self.last_relay_response,
+                        )
+                        return False
                 _LOGGER.debug(
                     "HA LiveKit relay POST status: endpoint=%s status=%s response=%s",
                     action,

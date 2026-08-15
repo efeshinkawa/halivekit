@@ -4,8 +4,8 @@ set_activity:
   fields:
     activity_id:
       name: Activity ID
-      description: Stable ID for this Live Activity, e.g. front_door or washing_machine. Reusing the same ID updates the existing activity instead of creating a duplicate.
-      required: true
+      description: Optional when Entity is selected; otherwise required. When omitted for an entity, HA LiveKit derives a stable ID from the entity ID so repeated calls update the same activity.
+      required: false
       example: front_door
       selector:
         text:
@@ -19,7 +19,7 @@ set_activity:
     allow_entity_control:
       name: Show On/Off controls
       description: Opt in to On and Off buttons for a light, switch, or input_boolean. The iOS app must remain connected to this Home Assistant instance. Applies when a new Live Activity starts; end and restart an existing activity to change this setting. Administrator or trusted automation/system context required.
-      required: false
+      required: true
       default: false
       selector:
         boolean:
@@ -137,7 +137,7 @@ start_activity:
     allow_entity_control:
       name: Show On/Off controls
       description: Opt in to On and Off buttons for a light, switch, or input_boolean. The iOS app must remain connected to this Home Assistant instance. Applies only when this call starts a new Live Activity. Administrator or trusted automation/system context required.
-      required: false
+      required: true
       default: false
       selector:
         boolean:
@@ -234,7 +234,7 @@ start_entity_activity:
     allow_entity_control:
       name: Show On/Off controls
       description: Opt in to On and Off buttons for a light, switch, or input_boolean. The iOS app must remain connected to this Home Assistant instance. Applies when a new Live Activity starts; end and restart an existing activity to change this setting. Administrator or trusted automation/system context required.
-      required: false
+      required: true
       default: false
       selector:
         boolean:
