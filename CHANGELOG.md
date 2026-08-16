@@ -1,5 +1,13 @@
 # HA LiveKit Changelog
 
+## 2.1.6 — No more false errors for in-flight and already-ended activities
+
+### Home Assistant integration
+
+- A repeated Set while the iPhone is still registering a just-started Live Activity is now reported as accepted-in-progress instead of the false "Relay returned HTTP 200" error. The relay keeps that start authoritative and re-sending would duplicate it.
+- Ending an activity that is already gone — ended earlier, dismissed on the device, or cleaned up by the app — now succeeds quietly instead of failing with "Relay returned HTTP 404". End is idempotent: the requested state is already true.
+- No relay or iOS changes; existing activities and automations are unchanged.
+
 ## 2.1.5 — Clear guidance for rapid Activity ID changes
 
 ### Home Assistant integration

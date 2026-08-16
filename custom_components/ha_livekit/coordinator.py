@@ -552,6 +552,22 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
                     )
                     return False
                 self.last_relay_response = _safe_response_summary(text)
+                if (
+                    action == ACTION_END
+                    and response.status == 404
+                    and _relay_error_code(text) == "no_activity_tokens"
+                ):
+                    # The activity is already gone - ended earlier, dismissed on the
+                    # device, or retired by the app's launch reconciliation. End is
+                    # idempotent: the requested end state is already true.
+                    self.last_relay_accepted_pending = True
+                    _LOGGER.info(
+                        "HA LiveKit relay end already satisfied (no matching activity): endpoint=%s status=%s response=%s",
+                        action,
+                        response.status,
+                        self.last_relay_response,
+                    )
+                    return False
                 if response.status >= 400:
                     self.last_relay_error_code = _relay_error_code(text)
                     self.last_relay_error = f"HTTP {response.status}: {self.last_relay_response}"
@@ -590,13 +606,31 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
                         return False
                     if delivered == 0:
                         reused_pending = relay_result.get("reused_pending")
+                        reused_persistent_intent = relay_result.get(
+                            "reused_persistent_intent"
+                        )
                         if (
                             action == ACTION_START
                             and attempted == 0
                             and response.status == 200
                             and relay_result.get("ok") is True
-                            and _is_nonnegative_json_integer(reused_pending)
-                            and reused_pending > 0
+                            and (
+                                (
+                                    _is_nonnegative_json_integer(reused_pending)
+                                    and reused_pending > 0
+                                )
+                                # A committed Start intent stays authoritative after
+                                # its short-lived pending record expires; the relay
+                                # reports it as awaiting the device's registration.
+                                # Re-sending would create a duplicate start, so this
+                                # is an accepted idempotent state, not a failure.
+                                or (
+                                    _is_nonnegative_json_integer(
+                                        reused_persistent_intent
+                                    )
+                                    and reused_persistent_intent > 0
+                                )
+                            )
                         ):
                             self.last_relay_accepted_pending = True
                             _LOGGER.info(

@@ -10,7 +10,7 @@ HA LiveKit connects Home Assistant automations to the HA LiveKit iOS app so your
 
 **App Store:** [Download HA LiveKit](https://go.efeer.im/halivekitapp)
 
-**Current versions:** iOS app **2.1.1** · HACS integration **2.1.5** (same 2.1 release line)
+**Current versions:** iOS app **2.1.1** · HACS integration **2.1.6** (same 2.1 release line)
 
 Read the complete [HA LiveKit changelog](CHANGELOG.md).
 
