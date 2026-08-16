@@ -1,5 +1,11 @@
 # HA LiveKit Changelog
 
+## 2.1.7 — Complete the idempotent-end fix
+
+### Home Assistant integration
+
+- 2.1.6 marked an End of an already-gone activity as accepted, but the service-level check still only honored that acceptance for HTTP 200 responses, so the "Relay returned HTTP 404" error could still appear. The check now honors both accepted outcomes. No other changes.
+
 ## 2.1.6 — No more false errors for in-flight and already-ended activities
 
 ### Home Assistant integration

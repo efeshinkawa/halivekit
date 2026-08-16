@@ -782,8 +782,11 @@ def _raise_if_background_delivery_failed(result: Any) -> None:
     if bool(getattr(result, "delivered_outbound", False)):
         return
     relay_status_code = getattr(result, "relay_status_code", None)
+    # The coordinator marks exactly two idempotent outcomes as accepted: a 200
+    # start that is still awaiting the device's registration, and a 404 end
+    # whose activity is already gone. Both are the requested state, not errors.
     if (
-        relay_status_code == 200
+        relay_status_code in (200, 404)
         and getattr(result, "relay_accepted_pending", False) is True
     ):
         return
