@@ -106,6 +106,12 @@ _PENDING_ENTITY_ACTIVITY_ID_CHANGED_MESSAGE = (
     "then end the previous Activity ID and retry. If it never registers, wait "
     "for the pending request to expire."
 )
+_ROUTE_HISTORY_CAPACITY_ERROR = "entity_route_history_capacity"
+_ROUTE_HISTORY_CAPACITY_MESSAGE = (
+    "This entity changed its Activity ID too many times in a short period. "
+    "Keep using one stable Activity ID; to switch to a new ID now, run "
+    "End Live Activity for the current ID once, then retry."
+)
 _PENDING_ACTIVITY_TOKEN_ERROR = "Live Activity start is still pending on the device"
 _PENDING_ACTIVITY_TOKEN_MESSAGE = (
     "The iPhone is still registering this Live Activity for background updates. "
@@ -765,6 +771,8 @@ def _raise_if_duplicate_activity_name_rejected(result: Any) -> None:
         raise HomeAssistantError(_PENDING_ENTITY_ACTIVITY_ID_CHANGED_MESSAGE)
     if relay_status_code == 409 and _ENTITY_ACTIVITY_ID_CHANGED_ERROR in relay_error:
         raise HomeAssistantError(_ENTITY_ACTIVITY_ID_CHANGED_MESSAGE)
+    if relay_status_code == 409 and _ROUTE_HISTORY_CAPACITY_ERROR in relay_error:
+        raise HomeAssistantError(_ROUTE_HISTORY_CAPACITY_MESSAGE)
 
 
 def _raise_if_background_delivery_failed(result: Any) -> None:

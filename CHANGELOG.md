@@ -1,5 +1,12 @@
 # HA LiveKit Changelog
 
+## 2.1.5 — Clear guidance for rapid Activity ID changes
+
+### Home Assistant integration
+
+- Replaces the generic "Relay returned HTTP 409" error with a clear, actionable message when an entity changes its Activity ID too many times in a short period: keep one stable Activity ID, or run End Live Activity once before switching to a new ID.
+- No behavior change otherwise; existing activities, actions, and relay compatibility are unchanged.
+
 ## 2.1.4 — Idempotent Set Live Activity
 
 ### Home Assistant integration

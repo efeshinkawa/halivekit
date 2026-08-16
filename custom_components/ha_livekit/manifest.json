@@ -1,7 +1,7 @@
 {
   "domain": "ha_livekit",
   "name": "HA LiveKit",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "config_flow": true,
   "single_config_entry": true,
   "documentation": "https://github.com/efeshinkawa/halivekit",
