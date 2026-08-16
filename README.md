@@ -10,7 +10,7 @@ HA LiveKit connects Home Assistant automations to the HA LiveKit iOS app so your
 
 **App Store:** [Download HA LiveKit](https://go.efeer.im/halivekitapp)
 
-**Current versions:** iOS app **2.1.1** · HACS integration **2.1.3** (same 2.1 release line)
+**Current versions:** iOS app **2.1.1** · HACS integration **2.1.4** (same 2.1 release line)
 
 Read the complete [HA LiveKit changelog](CHANGELOG.md).
 
@@ -18,7 +18,7 @@ Read the complete [HA LiveKit changelog](CHANGELOG.md).
 
 HA LiveKit 2.1 adds optional, secure **On** and **Off** controls for `light`, `switch`, and `input_boolean` Live Activities. Controls work from the Lock Screen and expanded Dynamic Island, are opt-in, and require local device authentication.
 
-HACS 2.1.3 makes foreground and background activity routing agree: Unicode activity IDs use collision-safe relay identities, existing valid ASCII IDs stay unchanged, and an entity-backed activity whose ID changes returns clear end-and-restart guidance. It also reports stale APNs registrations and other zero-delivery results as failures instead of false success. The companion iOS app remains at 2.1.1.
+HACS 2.1.4 makes the recommended **Set Live Activity** action truly idempotent. An immediate repeat while the iPhone is registering is accepted without a false error, and the matching managed relay safely converges older active IDs for the same entity onto one stable route. Explicit zero-delivery responses still fail closed. The same connection contract supports Nabu Casa, custom HTTPS domains, local hostnames and IPs, and localhost development URLs. The companion iOS app remains at 2.1.1.
 
 ## What it does
 
@@ -43,7 +43,7 @@ Use Home Assistant services to create Live Activities for doors, laundry, lights
 
 ## Version alignment
 
-Keep the iOS app and HACS integration on the same 2.1 release line. Update HA LiveKit to 2.1.3 in HACS and restart Home Assistant. The compatible iOS app remains at 2.1.1, so no companion app update is required. Patch versions may differ within the compatible 2.1 release line.
+Keep the iOS app and HACS integration on the same 2.1 release line. Update HA LiveKit to 2.1.4 in HACS and restart Home Assistant. The compatible iOS app remains at 2.1.1, so no companion app update is required. Patch versions may differ within the compatible 2.1 release line.
 
 ## Installation with HACS
 
@@ -85,7 +85,8 @@ Most users should use `ha_livekit.set_activity`.
 - It updates the existing Live Activity if it already exists.
 - When an entity is selected, `activity_id` may be left empty and HA LiveKit derives a stable ID so repeated calls update the same activity.
 - Existing valid ASCII activity IDs are preserved; Unicode activity IDs are supported through collision-safe background routing.
-- Do not change the ID of an active entity-backed activity. End it first, then start it again with the new ID.
+- Repeating the same entity and Activity ID is safe, including while the first background start is still registering.
+- With the matching managed relay, Set safely retires older active IDs for the same entity and converges on the requested stable ID. It never guesses through an unresolved pending registration.
 - For custom calls without an entity, provide an explicit `activity_id`.
 - If two entities in different domains share the same object ID, provide distinct explicit IDs for them (for example, `light_desk` and `switch_desk`).
 
@@ -166,6 +167,8 @@ If background updates do not arrive:
 - Make sure Live Activities are enabled on the iPhone.
 - Start one activity from inside the app before relying on background updates.
 - Check the HA LiveKit diagnostic sensor in Home Assistant.
+
+HA LiveKit accepts Nabu Casa and custom HTTPS URLs. It also accepts local HTTP URLs such as `http://homeassistant.local:8123`, `http://192.168.1.25:8123`, and `http://localhost:8123`; remote connections should use HTTPS.
 
 If icons or logos look stale:
 

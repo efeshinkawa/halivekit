@@ -5,7 +5,7 @@ from __future__ import annotations
 from homeassistant.const import Platform
 
 DOMAIN = "ha_livekit"
-VERSION = "2.1.3"
+VERSION = "2.1.4"
 
 CONF_SHARED_SECRET = "shared_secret"
 CONF_PUSH_ENDPOINT_URL = "push_endpoint_url"

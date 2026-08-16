@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from dataclasses import dataclass
 from datetime import UTC, datetime
 import hashlib
@@ -23,6 +24,7 @@ from .const import (
     ACTION_END,
     ACTION_START,
     ACTION_UPDATE,
+    ATTR_DATA,
     CONF_ALLOW_LEGACY_WEBHOOK_SECRET,
     CONF_PUSH_ENDPOINT_URL,
     CONF_HOME_ASSISTANT_INSTANCE_ID,
@@ -53,6 +55,9 @@ _LOGGER = logging.getLogger(__name__)
 _WEBHOOK_NONCE_PATTERN = re.compile(r"[A-Za-z0-9._~-]{16,128}")
 _WEBHOOK_SIGNATURE_PATTERN = re.compile(r"(?:sha256=)?[a-f0-9]{64}")
 _MAX_RELAY_RESPONSE_BYTES = 32 * 1024
+_ENTITY_SET_OPERATION_HEADER = "X-HA-LiveKit-Operation"
+_ENTITY_SET_OPERATION_VALUE = "entity-set-v1"
+_RESERVED_ENTITY_SET_DATA_KEYS = frozenset({"entity_based", "source_service"})
 _SEMANTIC_ENTITY_RELAY_ERRORS = frozenset(
     {
         "ambiguous_entity_activity",
@@ -83,6 +88,7 @@ class DispatchResult:
     relay_enabled: bool
     relay_status_code: int | None = None
     relay_error: str | None = None
+    relay_accepted_pending: bool = False
 
 
 class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
@@ -99,6 +105,8 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
         self.last_relay_response: str | None = None
         self.last_relay_error: str | None = None
         self.last_relay_error_code: str | None = None
+        self.last_relay_accepted_pending: bool = False
+        self._relay_dispatch_lock = asyncio.Lock()
         self._webhook_replay_cache: dict[str, float] = {}
         self._legacy_webhook_warning_logged = False
 
@@ -209,7 +217,6 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
         """Publish an activity request inside HA and optionally to a relay endpoint."""
         message = self._normalize_message(action, payload)
         delivered_outbound = False
-        relay_error = None
         relay_enabled = self.relay_enabled
         defer_local_publish = relay_enabled and _is_entity_backed_set_message(message)
         delivered_locally = False
@@ -226,19 +233,27 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
             message.get("action"),
         )
 
-        if relay_enabled:
-            delivered_outbound = await self._post_to_relay(message)
+        async with self._relay_dispatch_lock:
+            self._reset_last_relay_state()
+            if relay_enabled:
+                delivered_outbound = await self._post_to_relay(message)
+                self.async_update_listeners()
+            else:
+                self.last_relay_error = "Relay forwarding disabled"
+                _LOGGER.debug(
+                    "HA LiveKit background relay forwarding disabled; foreground event bus only"
+                )
+
+            relay_status_code = self.last_relay_status_code
             relay_error = self.last_relay_error
-            self.async_update_listeners()
-        else:
-            self.last_relay_error = "Relay forwarding disabled"
-            _LOGGER.debug("HA LiveKit background relay forwarding disabled; foreground event bus only")
+            relay_error_code = self.last_relay_error_code
+            relay_accepted_pending = self.last_relay_accepted_pending
 
         semantic_rejection = (
             defer_local_publish
             and not delivered_outbound
-            and self.last_relay_status_code == 409
-            and self.last_relay_error_code in _SEMANTIC_ENTITY_RELAY_ERRORS
+            and relay_status_code == 409
+            and relay_error_code in _SEMANTIC_ENTITY_RELAY_ERRORS
         )
         if defer_local_publish and not semantic_rejection:
             self._publish_local(message)
@@ -246,7 +261,7 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
         elif semantic_rejection:
             _LOGGER.warning(
                 "HA LiveKit withheld foreground event after relay semantic rejection: error=%s activity_id=%s",
-                self.last_relay_error_code,
+                relay_error_code,
                 message.get("activity_id"),
             )
 
@@ -254,8 +269,9 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
             delivered_locally=delivered_locally,
             delivered_outbound=delivered_outbound,
             relay_enabled=relay_enabled,
-            relay_status_code=self.last_relay_status_code,
+            relay_status_code=relay_status_code,
             relay_error=relay_error,
+            relay_accepted_pending=relay_accepted_pending,
         )
 
     async def async_handle_webhook(
@@ -265,6 +281,7 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
         """Handle a signed webhook payload."""
         action = str(payload.get("action") or payload.get("type") or ACTION_UPDATE)
         payload = {key: value for key, value in payload.items() if key not in {"secret"}}
+        payload = _without_internal_entity_set_markers(payload)
         return await self.async_send_activity(action, payload)
 
     def signature_for_bytes(
@@ -435,12 +452,9 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
         relay_url = self.relay_url.strip()
         relay_secret = self.relay_shared_secret.strip()
         action = str(message.get("action") or "").strip()
+        self._reset_last_relay_state()
         self.last_relay_attempt_at = datetime.now(UTC).isoformat()
         self.last_relay_action = action or None
-        self.last_relay_status_code = None
-        self.last_relay_response = None
-        self.last_relay_error = None
-        self.last_relay_error_code = None
 
         if not relay_url:
             if self.relay_mode == RELAY_MODE_MANAGED:
@@ -481,6 +495,8 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
         headers = {"Content-Type": "application/json"}
         if relay_secret:
             headers[HEADER_SECRET] = relay_secret
+        if _is_entity_backed_set_message(message):
+            headers[_ENTITY_SET_OPERATION_HEADER] = _ENTITY_SET_OPERATION_VALUE
         url = f"{relay_url.rstrip('/')}/{action}"
         _LOGGER.debug(
             "HA LiveKit relay POST attempt: enabled=%s url_present=%s endpoint=%s activity_id=%s secret_present=%s environment=%s instance_id_prefix=%s",
@@ -546,30 +562,82 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
                         self.last_relay_response,
                     )
                     return False
-                if action == ACTION_START:
-                    try:
-                        relay_result = json.loads(text)
-                    except json.JSONDecodeError:
-                        relay_result = None
+                try:
+                    relay_result = json.loads(text)
+                except json.JSONDecodeError:
+                    relay_result = None
+                if isinstance(relay_result, dict) and (
+                    "attempted" in relay_result or "delivered" in relay_result
+                ):
+                    attempted = relay_result.get("attempted")
+                    delivered = relay_result.get("delivered")
                     if (
-                        isinstance(relay_result, dict)
-                        and relay_result.get("attempted") == 0
-                        and relay_result.get("delivered") == 0
-                        and isinstance(relay_result.get("reused_pending"), int)
-                        and not isinstance(relay_result.get("reused_pending"), bool)
-                        and relay_result["reused_pending"] > 0
+                        not _is_nonnegative_json_integer(attempted)
+                        or not _is_nonnegative_json_integer(delivered)
+                        or delivered > attempted
                     ):
+                        self.last_relay_error_code = "invalid_delivery_counters"
                         self.last_relay_error = (
-                            "Live Activity start is still pending on the device; "
-                            "wait for the iOS app to register its activity update token, then retry"
+                            "Relay returned invalid delivery counters: "
+                            f"{self.last_relay_response}"
                         )
                         _LOGGER.warning(
-                            "HA LiveKit relay start still pending: endpoint=%s status=%s response=%s",
+                            "HA LiveKit relay rejected invalid counters: endpoint=%s status=%s response=%s",
                             action,
                             response.status,
                             self.last_relay_response,
                         )
                         return False
+                    if delivered == 0:
+                        reused_pending = relay_result.get("reused_pending")
+                        if (
+                            action == ACTION_START
+                            and attempted == 0
+                            and response.status == 200
+                            and relay_result.get("ok") is True
+                            and _is_nonnegative_json_integer(reused_pending)
+                            and reused_pending > 0
+                        ):
+                            self.last_relay_accepted_pending = True
+                            _LOGGER.info(
+                                "HA LiveKit relay accepted idempotent pending start: endpoint=%s status=%s response=%s",
+                                action,
+                                response.status,
+                                self.last_relay_response,
+                            )
+                            return False
+                        self.last_relay_error_code = (
+                            _relay_error_code(text)
+                            or "zero_delivery_not_accepted"
+                        )
+                        self.last_relay_error = (
+                            "Relay reported zero deliveries without an accepted pending "
+                            f"registration: {self.last_relay_response}"
+                        )
+                        _LOGGER.warning(
+                            "HA LiveKit relay rejected zero delivery: endpoint=%s status=%s response=%s",
+                            action,
+                            response.status,
+                            self.last_relay_response,
+                        )
+                        return False
+                if isinstance(relay_result, dict) and (
+                    "ok" in relay_result and relay_result.get("ok") is not True
+                ):
+                    self.last_relay_error_code = (
+                        _relay_error_code(text) or "relay_response_not_ok"
+                    )
+                    self.last_relay_error = (
+                        "Relay response did not report success: "
+                        f"{self.last_relay_response}"
+                    )
+                    _LOGGER.warning(
+                        "HA LiveKit relay rejected unsuccessful 2xx response: endpoint=%s status=%s response=%s",
+                        action,
+                        response.status,
+                        self.last_relay_response,
+                    )
+                    return False
                 _LOGGER.debug(
                     "HA LiveKit relay POST status: endpoint=%s status=%s response=%s",
                     action,
@@ -582,6 +650,40 @@ class HALiveKitCoordinator(DataUpdateCoordinator[dict[str, Any] | None]):
             return False
 
         return True
+
+    def _reset_last_relay_state(self) -> None:
+        """Clear per-dispatch relay diagnostics before a new send decision."""
+        self.last_relay_attempt_at = None
+        self.last_relay_action = None
+        self.last_relay_status_code = None
+        self.last_relay_response = None
+        self.last_relay_error = None
+        self.last_relay_error_code = None
+        self.last_relay_accepted_pending = False
+
+
+def _is_nonnegative_json_integer(value: Any) -> bool:
+    """Return whether a JSON counter is a non-negative integer, excluding bool."""
+    return isinstance(value, int) and not isinstance(value, bool) and value >= 0
+
+
+def _without_internal_entity_set_markers(
+    payload: dict[str, Any],
+) -> dict[str, Any]:
+    """Remove relay control markers reserved for service-built entity Set calls."""
+    data = payload.get(ATTR_DATA)
+    if not isinstance(data, dict) or not any(
+        key in data for key in _RESERVED_ENTITY_SET_DATA_KEYS
+    ):
+        return payload
+
+    sanitized = dict(payload)
+    sanitized[ATTR_DATA] = {
+        key: value
+        for key, value in data.items()
+        if key not in _RESERVED_ENTITY_SET_DATA_KEYS
+    }
+    return sanitized
 
 
 def _is_entity_backed_set_message(message: dict[str, Any]) -> bool:

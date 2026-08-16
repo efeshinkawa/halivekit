@@ -66,7 +66,10 @@ from .const import (
     SERVICE_UPDATE_ENTITY_ACTIVITY,
     UNSAFE_HOME_ASSISTANT_INSTANCE_IDS,
 )
-from .coordinator import HALiveKitCoordinator
+from .coordinator import (
+    HALiveKitCoordinator,
+    _without_internal_entity_set_markers,
+)
 from .entity_activity import build_entity_activity_payload
 from .pairing import async_register_pairing_view
 from .security import (
@@ -323,7 +326,7 @@ async def _handle_service(
     action: str,
     call: ServiceCall,
 ) -> None:
-    payload = dict(call.data)
+    payload = _without_internal_entity_set_markers(dict(call.data))
     _validate_activity_service_payload(payload)
     await _async_require_generic_activity_permissions(hass, call, payload)
     coordinator = _get_coordinator(hass)
@@ -392,6 +395,7 @@ async def _handle_set_activity(
     await _async_require_trusted_manual_activity_caller(hass, call)
     if not str(payload.get(ATTR_ACTIVITY_ID, "")).strip():
         raise HomeAssistantError("Activity ID is required when Entity is omitted")
+    payload = _without_internal_entity_set_markers(payload)
     coordinator = _get_coordinator(hass)
     result = await coordinator.async_send_activity(ACTION_START, payload)
     _raise_if_duplicate_activity_name_rejected(result)
@@ -769,8 +773,13 @@ def _raise_if_background_delivery_failed(result: Any) -> None:
         return
     if bool(getattr(result, "delivered_outbound", False)):
         return
-
     relay_status_code = getattr(result, "relay_status_code", None)
+    if (
+        relay_status_code == 200
+        and getattr(result, "relay_accepted_pending", False) is True
+    ):
+        return
+
     relay_error = str(getattr(result, "relay_error", "") or "")
     if _PENDING_ACTIVITY_TOKEN_ERROR in relay_error:
         raise HomeAssistantError(

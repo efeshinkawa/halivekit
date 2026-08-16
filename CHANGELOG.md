@@ -1,5 +1,21 @@
 # HA LiveKit Changelog
 
+## 2.1.4 — Idempotent Set Live Activity
+
+### Home Assistant integration
+
+- Treats an immediate repeat of the same background start as an accepted in-progress request while the iPhone registers its ActivityKit update token, instead of showing a false error or requiring a renamed Activity ID.
+- Lets the recommended entity-backed `set_activity` action safely converge older active IDs for the same entity onto the requested stable ID when the managed relay can prove each exact registration generation.
+- Rejects every explicit zero-delivery relay response for start, update, and end, while preserving compatibility with older successful relay responses that do not include delivery counters.
+- Labels the legacy relay setup action as automatic compatibility plumbing so users know not to add it to automations; its existing authorization and released-client compatibility remain unchanged.
+
+### Compatibility and connection URLs
+
+- Existing v1 registrations, valid ASCII and Unicode activity IDs, raw/advanced actions, device scopes, and current Live Activities remain compatible.
+- Nabu Casa HTTPS, arbitrary custom HTTPS domains, local `.local` hostnames, LAN IP addresses, and `localhost` development URLs use the same canonical Home Assistant identity and are not allowlisted by hostname.
+- Custom relay operators must deploy the matching Worker before relying on automatic active-ID reconciliation. Pending registrations are never deleted automatically.
+- HA LiveKit iOS remains at 2.1.1; the new TestFlight build contains the same app source and validates this coordinated HACS/relay release.
+
 ## 2.1.3 — Stable Background Activity Routing
 
 ### Home Assistant integration

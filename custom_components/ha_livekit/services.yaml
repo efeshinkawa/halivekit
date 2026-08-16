@@ -529,8 +529,8 @@ end_activity:
         text:
 
 configure_managed_relay:
-  name: Internal Relay Setup
-  description: Internal authenticated-admin-only setup used by the iOS app. Calls without a known administrator are rejected. You normally do not need to add this action manually.
+  name: Automatic Relay Setup (Do Not Add Manually)
+  description: Used automatically by the HA LiveKit app for secure relay compatibility with existing app versions. Do not add this action to automations.
   fields:
     relay_url:
       name: Managed relay URL
