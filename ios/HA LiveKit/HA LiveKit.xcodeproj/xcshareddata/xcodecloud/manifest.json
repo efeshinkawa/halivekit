@@ -1,0 +1,9 @@
+{
+  "id" : "bc4f0348-e1d7-4db4-b037-bda179dca0ae",
+  "targets" : [
+    {
+      "id" : "d2477938-11ff-45b3-84d7-2aa9135178cb",
+      "name" : "HA LiveKit"
+    }
+  ]
+}

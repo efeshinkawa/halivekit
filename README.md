@@ -190,3 +190,25 @@ Most users should use `ha_livekit.set_activity` for new automations. The iOS app
 ## Privacy and security
 
 Privacy Policy: [PRIVACY.md](PRIVACY.md)
+
+Security policy and vulnerability reporting: [SECURITY.md](SECURITY.md)
+
+## Source code
+
+This repository contains the whole HA LiveKit project under the MIT license:
+
+| Path | What it is |
+|---|---|
+| `custom_components/ha_livekit/` | The Home Assistant integration that HACS installs |
+| `ios/` | The iOS app and its Live Activity widget |
+| `relay/cloudflare-worker/` | The APNs relay (Cloudflare Worker) that delivers Live Activity pushes |
+| `docs/` | Design notes, the relay authentication design, and release notes |
+| `tests/` | Integration security regression tests |
+
+No credentials are stored in this repository. The APNs signing key and the other relay secrets exist only as Cloudflare Worker secrets. The iOS build receives its relay configuration from CI. See [SECURITY.md](SECURITY.md) for how the legacy app key is handled. HACS only installs `custom_components/ha_livekit/`; the other folders are never copied into Home Assistant.
+
+To build your own copy of the app with your own Apple developer account and relay, see [docs/SELF_HOSTING.md](docs/SELF_HOSTING.md).
+
+## Trademark
+
+The code is MIT licensed, so you can fork, modify, and redistribute it. The "HA LiveKit" name and app icon identify the official app and relay. Forks distributed on the App Store or elsewhere must use their own name, icon, and bundle identifier.

@@ -1,0 +1,15 @@
+title = "HA LiveKit secret scanning"
+
+[extend]
+useDefault = true
+
+# Synthetic fixtures in the relay tests look like credentials but are not.
+# Only these exact literal values are allowed; anything else in the tests is still scanned.
+[[allowlists]]
+description = "Synthetic relay test fixtures"
+paths = ['''^relay/cloudflare-worker/test/[^/]+\.test\.mjs$''']
+regexes = [
+  '''^fresh-after-successful-end-0123456789$''',
+  '''^wrong-secret-012345678901234567890123456789$''',
+]
+condition = "AND"

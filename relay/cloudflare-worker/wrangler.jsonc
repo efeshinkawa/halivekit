@@ -1,0 +1,178 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ha-livekit-apns-relay",
+  "main": "src/index.js",
+  "compatibility_date": "2026-05-08",
+  "workers_dev": true,
+  "preview_urls": false,
+  "version_metadata": {
+    "binding": "CF_VERSION_METADATA"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "TOKENS",
+      "id": "01875e8c15a54dc5a60c19068d63fd23"
+    }
+  ],
+  "ratelimits": [
+    {
+      "name": "RATE_LIMITER",
+      "namespace_id": "694210",
+      "simple": {
+        "limit": 300,
+        "period": 60
+      }
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "AUTH_STATE",
+        "class_name": "RelayAuthState"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "auth-state-v1",
+      "new_sqlite_classes": [
+        "RelayAuthState"
+      ]
+    }
+  ],
+  "vars": {
+    "APNS_ENVIRONMENT": "production",
+    "APNS_MOCK": "false",
+    "APNS_ATTRIBUTES_TYPE": "HALiveActivityAttributes",
+    "APNS_INCLUDE_INPUT_PUSH_TOKEN": "true",
+    "RELAY_ENABLED": "true",
+    "RATE_LIMIT_MODE": "binding-required",
+    "MAX_REQUEST_BODY_BYTES": "32768",
+    "MAX_DEVICES_PER_INSTANCE": "32",
+    "MAX_ACTIVITIES_PER_INSTANCE": "256",
+    "MAX_ACTIVITIES_PER_DEVICE": "32",
+    "DEVICE_TTL_SECONDS": "15552000",
+    "ACTIVITY_TTL_SECONDS": "172800",
+    "ACTIVITY_STATE_TTL_SECONDS": "43200",
+    "SECRET_TTL_SECONDS": "34560000",
+    "PAIRING_TTL_SECONDS": "300",
+    "ACTIVITY_GENERATION_MODE": "compatible",
+    "V2_PAIRING_MODE": "off",
+    "V2_PAIRING_CANARY_INSTANCE_HASHES": "",
+    "APPLE_TEAM_ID": "JBRVB5Z6X7",
+    "APPLE_KEY_ID": "67GKN2W8HH",
+    "APP_BUNDLE_ID": "com.efeyesoylegelsin.HALiveKit"
+  },
+  "env": {
+    "staging": {
+      "name": "ha-livekit-apns-relay-staging",
+      "workers_dev": true,
+      "preview_urls": false,
+      "version_metadata": {
+        "binding": "CF_VERSION_METADATA"
+      },
+      "kv_namespaces": [
+        {
+          "binding": "TOKENS",
+          "id": "8bf1720a747e4a1c8da8a2d94ecd7e06"
+        }
+      ],
+      "ratelimits": [
+        {
+          "name": "RATE_LIMITER",
+          "namespace_id": "861527",
+          "simple": {
+            "limit": 300,
+            "period": 60
+          }
+        }
+      ],
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "AUTH_STATE",
+            "class_name": "RelayAuthState"
+          }
+        ]
+      },
+      "vars": {
+        "APNS_ENVIRONMENT": "sandbox",
+        "APNS_ATTRIBUTES_TYPE": "HALiveActivityAttributes",
+        "APNS_INCLUDE_INPUT_PUSH_TOKEN": "true",
+        "APNS_MOCK": "true",
+        "RELAY_ENABLED": "true",
+        "RATE_LIMIT_MODE": "binding-required",
+        "MAX_REQUEST_BODY_BYTES": "32768",
+        "MAX_DEVICES_PER_INSTANCE": "32",
+        "MAX_ACTIVITIES_PER_INSTANCE": "256",
+        "MAX_ACTIVITIES_PER_DEVICE": "32",
+        "DEVICE_TTL_SECONDS": "15552000",
+        "ACTIVITY_TTL_SECONDS": "172800",
+        "ACTIVITY_STATE_TTL_SECONDS": "43200",
+        "SECRET_TTL_SECONDS": "34560000",
+        "PAIRING_TTL_SECONDS": "300",
+        "ACTIVITY_GENERATION_MODE": "authoritative",
+        "V2_PAIRING_MODE": "off",
+        "V2_PAIRING_CANARY_INSTANCE_HASHES": "",
+        "APPLE_TEAM_ID": "JBRVB5Z6X7",
+        "APPLE_KEY_ID": "67GKN2W8HH",
+        "APP_BUNDLE_ID": "com.efeyesoylegelsin.HALiveKit"
+      }
+    },
+    "development": {
+      "name": "ha-livekit-apns-relay-development",
+      "workers_dev": true,
+      "preview_urls": false,
+      "version_metadata": {
+        "binding": "CF_VERSION_METADATA"
+      },
+      "kv_namespaces": [
+        {
+          "binding": "TOKENS",
+          "id": "00000000000000000000000000000000"
+        }
+      ],
+      "ratelimits": [
+        {
+          "name": "RATE_LIMITER",
+          "namespace_id": "0",
+          "simple": {
+            "limit": 300,
+            "period": 60
+          }
+        }
+      ],
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "AUTH_STATE",
+            "class_name": "RelayAuthState"
+          }
+        ]
+      },
+      "vars": {
+        "APNS_ENVIRONMENT": "sandbox",
+        "APNS_ATTRIBUTES_TYPE": "HALiveActivityAttributes",
+        "APNS_INCLUDE_INPUT_PUSH_TOKEN": "true",
+        "APNS_MOCK": "true",
+        "RELAY_ENABLED": "true",
+        "RATE_LIMIT_MODE": "local",
+        "MAX_REQUEST_BODY_BYTES": "32768",
+        "MAX_DEVICES_PER_INSTANCE": "32",
+        "MAX_ACTIVITIES_PER_INSTANCE": "256",
+        "MAX_ACTIVITIES_PER_DEVICE": "32",
+        "DEVICE_TTL_SECONDS": "15552000",
+        "ACTIVITY_TTL_SECONDS": "172800",
+        "ACTIVITY_STATE_TTL_SECONDS": "43200",
+        "SECRET_TTL_SECONDS": "34560000",
+        "PAIRING_TTL_SECONDS": "300",
+        "ACTIVITY_GENERATION_MODE": "authoritative",
+        "V2_PAIRING_MODE": "off",
+        "V2_PAIRING_CANARY_INSTANCE_HASHES": "",
+        "APPLE_TEAM_ID": "JBRVB5Z6X7",
+        "APPLE_KEY_ID": "67GKN2W8HH",
+        "APP_BUNDLE_ID": "com.efeyesoylegelsin.HALiveKit"
+      }
+    }
+  }
+}

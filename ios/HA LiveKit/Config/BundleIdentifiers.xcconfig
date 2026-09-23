@@ -1,0 +1,11 @@
+// Change these values before running on a real device.
+// For simulator-only testing, HALIVEKIT_DEVELOPMENT_TEAM may stay empty.
+HALIVEKIT_BUNDLE_ID = com.efeyesoylegelsin.HALiveKit
+HALIVEKIT_WIDGET_BUNDLE_ID = $(HALIVEKIT_BUNDLE_ID).widget
+HALIVEKIT_DEVELOPMENT_TEAM = JBRVB5Z6X7
+HALIVEKIT_MANAGED_RELAY_URL =
+HALIVEKIT_MANAGED_RELAY_APP_KEY =
+HALIVEKIT_RELAY_ENVIRONMENT = sandbox
+
+// Optional local, gitignored overrides for relay URL/app key.
+#include? "LocalSecrets.xcconfig"

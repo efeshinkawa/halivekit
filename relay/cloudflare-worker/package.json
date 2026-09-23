@@ -1,0 +1,20 @@
+{
+  "name": "ha-livekit-apns-relay",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check src/index.js",
+    "test": "node --test test/*.test.mjs",
+    "dev": "wrangler dev --env development",
+    "deploy": "node scripts/deploy.mjs --target=production --phase=bridge",
+    "deploy:managed": "node scripts/deploy.mjs --target=production --phase=bridge",
+    "rollout:staging": "node scripts/deploy.mjs --target=staging --phase=all",
+    "rollout:allowlist": "node scripts/deploy.mjs --target=production --phase=allowlist",
+    "rollout:all": "node scripts/deploy.mjs --target=production --phase=all",
+    "rollout:rollback": "node scripts/deploy.mjs --target=production --phase=rollback"
+  },
+  "devDependencies": {
+    "wrangler": "4.110.0"
+  }
+}

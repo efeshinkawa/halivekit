@@ -1,0 +1,815 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B00000000000000000000001 /* HA_LiveKitApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000001 /* HA_LiveKitApp.swift */; };
+		B00000000000000000000002 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000002 /* AppModel.swift */; };
+		B00000000000000000000003 /* AppRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000003 /* AppRootView.swift */; };
+		B00000000000000000000004 /* HALiveKitIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000004 /* HALiveKitIntents.swift */; };
+		B00000000000000000000005 /* ConnectionConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000005 /* ConnectionConfiguration.swift */; };
+		B00000000000000000000006 /* KeychainCredentialStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000006 /* KeychainCredentialStore.swift */; };
+		B00000000000000000000007 /* HomeAssistantClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000007 /* HomeAssistantClient.swift */; };
+		B00000000000000000000008 /* HomeAssistantWebSocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000008 /* HomeAssistantWebSocketManager.swift */; };
+		B00000000000000000000009 /* LiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000009 /* LiveActivityManager.swift */; };
+		B00000000000000000000010 /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000010 /* DesignSystem.swift */; };
+		B00000000000000000000011 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000011 /* OnboardingView.swift */; };
+		B00000000000000000000012 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000012 /* DashboardView.swift */; };
+		B00000000000000000000013 /* EntityPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000013 /* EntityPickerView.swift */; };
+		B00000000000000000000014 /* ActivityBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000014 /* ActivityBuilderView.swift */; };
+		B00000000000000000000015 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000015 /* SettingsView.swift */; };
+		B00000000000000000000016 /* HALiveActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000016 /* HALiveActivityAttributes.swift */; };
+		B00000000000000000000017 /* HAEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000017 /* HAEntity.swift */; };
+		B00000000000000000000018 /* LiveActivityTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000018 /* LiveActivityTemplate.swift */; };
+		B00000000000000000000019 /* MockData.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000019 /* MockData.swift */; };
+		B00000000000000000000020 /* HALiveActivityTheme+SwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000020 /* HALiveActivityTheme+SwiftUI.swift */; };
+		B00000000000000000000021 /* HALiveActivityWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000021 /* HALiveActivityWidgetBundle.swift */; };
+		B00000000000000000000022 /* HALiveActivityWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000022 /* HALiveActivityWidget.swift */; };
+		B00000000000000000000023 /* HALiveActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000016 /* HALiveActivityAttributes.swift */; };
+		B00000000000000000000024 /* HALiveActivityTheme+SwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000020 /* HALiveActivityTheme+SwiftUI.swift */; };
+		B00000000000000000000025 /* HA LiveKitWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = P00000000000000000000002 /* HA LiveKitWidget.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		B00000000000000000000026 /* HALiveKitActivityRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000026 /* HALiveKitActivityRequest.swift */; };
+		B00000000000000000000027 /* DiagnosticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000027 /* DiagnosticsView.swift */; };
+		B00000000000000000000028 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000028 /* Assets.xcassets */; };
+		B000000000000000000000A1 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = A000000000000000000000A1 /* AppIcon.icon */; };
+		B00000000000000000000029 /* APNsRelaySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000029 /* APNsRelaySettings.swift */; };
+		B00000000000000000000030 /* APNsLiveActivityRelayClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000030 /* APNsLiveActivityRelayClient.swift */; };
+		B00000000000000000000031 /* LiveActivityRelayRegistrar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000031 /* LiveActivityRelayRegistrar.swift */; };
+		B00000000000000000000032 /* DemoHomeProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000033 /* DemoHomeProvider.swift */; };
+		B00000000000000000000033 /* ManagedRelayConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000034 /* ManagedRelayConfig.swift */; };
+		B00000000000000000000034 /* EntityLiveActivityBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000035 /* EntityLiveActivityBuilder.swift */; };
+		B00000000000000000000035 /* HAEntityCacheStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000036 /* HAEntityCacheStore.swift */; };
+		B00000000000000000000036 /* L10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000037 /* L10n.swift */; };
+		B00000000000000000000037 /* L10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000037 /* L10n.swift */; };
+		B00000000000000000000038 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = V00000000000000000000001 /* Localizable.strings */; };
+		B00000000000000000000039 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = V00000000000000000000001 /* Localizable.strings */; };
+		B00000000000000000000040 /* HomeAssistantConnectionResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000045 /* HomeAssistantConnectionResolver.swift */; };
+		B00000000000000000000041 /* AppPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000047 /* AppPreferences.swift */; };
+		B00000000000000000000042 /* AppPreferencesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000048 /* AppPreferencesStore.swift */; };
+		B00000000000000000000043 /* CloudKitPreferencesMirror.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000049 /* CloudKitPreferencesMirror.swift */; };
+		B00000000000000000000044 /* iCloudAccountObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000050 /* iCloudAccountObserver.swift */; };
+		B00000000000000000000045 /* WhatsNewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000051 /* WhatsNewView.swift */; };
+		B00000000000000000000046 /* HealthChecklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000052 /* HealthChecklist.swift */; };
+		B00000000000000000000047 /* HealthChecklistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000053 /* HealthChecklistView.swift */; };
+		B00000000000000000000048 /* AppLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000061 /* AppLanguage.swift */; };
+		B00000000000000000000049 /* AppUpdateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000062 /* AppUpdateService.swift */; };
+		B00000000000000000000050 /* notices in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000063 /* notices */; };
+		B00000000000000000000051 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000064 /* PrivacyInfo.xcprivacy */; };
+		B71000000000000000000001 /* HALiveActivityEntityControlIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71000000000000000000001 /* HALiveActivityEntityControlIntent.swift */; };
+		B71000000000000000000002 /* HALiveActivityEntityControlIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71000000000000000000001 /* HALiveActivityEntityControlIntent.swift */; };
+		B71000000000000000000003 /* LiveActivityEntityControlService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71000000000000000000002 /* LiveActivityEntityControlService.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D00000000000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E00000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = T00000000000000000000002;
+			remoteInfo = "HA LiveKitWidget";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F00000000000000000000001 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				B00000000000000000000025 /* HA LiveKitWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		A00000000000000000000001 /* HA_LiveKitApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HA_LiveKitApp.swift; sourceTree = "<group>"; };
+		A00000000000000000000002 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		A00000000000000000000003 /* AppRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRootView.swift; sourceTree = "<group>"; };
+		A00000000000000000000004 /* HALiveKitIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HALiveKitIntents.swift; sourceTree = "<group>"; };
+		A00000000000000000000005 /* ConnectionConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionConfiguration.swift; sourceTree = "<group>"; };
+		A00000000000000000000006 /* KeychainCredentialStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainCredentialStore.swift; sourceTree = "<group>"; };
+		A00000000000000000000007 /* HomeAssistantClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeAssistantClient.swift; sourceTree = "<group>"; };
+		A00000000000000000000008 /* HomeAssistantWebSocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeAssistantWebSocketManager.swift; sourceTree = "<group>"; };
+		A00000000000000000000009 /* LiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityManager.swift; sourceTree = "<group>"; };
+		A00000000000000000000010 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
+		A00000000000000000000011 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		A00000000000000000000012 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		A00000000000000000000013 /* EntityPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityPickerView.swift; sourceTree = "<group>"; };
+		A00000000000000000000014 /* ActivityBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityBuilderView.swift; sourceTree = "<group>"; };
+		A00000000000000000000015 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A00000000000000000000016 /* HALiveActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HALiveActivityAttributes.swift; sourceTree = "<group>"; };
+		A00000000000000000000017 /* HAEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HAEntity.swift; sourceTree = "<group>"; };
+		A00000000000000000000018 /* LiveActivityTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityTemplate.swift; sourceTree = "<group>"; };
+		A00000000000000000000019 /* MockData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockData.swift; sourceTree = "<group>"; };
+		A00000000000000000000020 /* HALiveActivityTheme+SwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HALiveActivityTheme+SwiftUI.swift"; sourceTree = "<group>"; };
+		A00000000000000000000021 /* HALiveActivityWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HALiveActivityWidgetBundle.swift; sourceTree = "<group>"; };
+		A00000000000000000000022 /* HALiveActivityWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HALiveActivityWidget.swift; sourceTree = "<group>"; };
+		A00000000000000000000023 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A00000000000000000000024 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A00000000000000000000025 /* BundleIdentifiers.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = BundleIdentifiers.xcconfig; sourceTree = "<group>"; };
+		A00000000000000000000026 /* HALiveKitActivityRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HALiveKitActivityRequest.swift; sourceTree = "<group>"; };
+		A00000000000000000000027 /* DiagnosticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsView.swift; sourceTree = "<group>"; };
+		A00000000000000000000028 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A000000000000000000000A1 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
+		A00000000000000000000029 /* APNsRelaySettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APNsRelaySettings.swift; sourceTree = "<group>"; };
+		A00000000000000000000030 /* APNsLiveActivityRelayClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APNsLiveActivityRelayClient.swift; sourceTree = "<group>"; };
+		A00000000000000000000031 /* LiveActivityRelayRegistrar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityRelayRegistrar.swift; sourceTree = "<group>"; };
+		A00000000000000000000032 /* HA LiveKit.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "HA LiveKit.entitlements"; sourceTree = "<group>"; };
+		A00000000000000000000033 /* DemoHomeProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoHomeProvider.swift; sourceTree = "<group>"; };
+		A00000000000000000000034 /* ManagedRelayConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedRelayConfig.swift; sourceTree = "<group>"; };
+		A00000000000000000000035 /* EntityLiveActivityBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityLiveActivityBuilder.swift; sourceTree = "<group>"; };
+		A00000000000000000000036 /* HAEntityCacheStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HAEntityCacheStore.swift; sourceTree = "<group>"; };
+		A00000000000000000000037 /* L10n.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = L10n.swift; sourceTree = "<group>"; };
+		A00000000000000000000038 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A00000000000000000000039 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A00000000000000000000040 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A00000000000000000000041 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A00000000000000000000042 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A00000000000000000000043 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A00000000000000000000044 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A00000000000000000000045 /* HomeAssistantConnectionResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeAssistantConnectionResolver.swift; sourceTree = "<group>"; };
+		A00000000000000000000046 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A00000000000000000000047 /* AppPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPreferences.swift; sourceTree = "<group>"; };
+		A00000000000000000000048 /* AppPreferencesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPreferencesStore.swift; sourceTree = "<group>"; };
+		A00000000000000000000049 /* CloudKitPreferencesMirror.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitPreferencesMirror.swift; sourceTree = "<group>"; };
+		A00000000000000000000050 /* iCloudAccountObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iCloudAccountObserver.swift; sourceTree = "<group>"; };
+		A00000000000000000000051 /* WhatsNewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhatsNewView.swift; sourceTree = "<group>"; };
+		A00000000000000000000052 /* HealthChecklist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthChecklist.swift; sourceTree = "<group>"; };
+		A00000000000000000000053 /* HealthChecklistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthChecklistView.swift; sourceTree = "<group>"; };
+		A00000000000000000000054 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A00000000000000000000055 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A00000000000000000000056 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A00000000000000000000057 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A00000000000000000000058 /* no */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = no; path = no.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A00000000000000000000059 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A00000000000000000000060 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A00000000000000000000061 /* AppLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguage.swift; sourceTree = "<group>"; };
+		A00000000000000000000062 /* AppUpdateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdateService.swift; sourceTree = "<group>"; };
+		A00000000000000000000063 /* notices */ = {isa = PBXFileReference; lastKnownFileType = folder; name = notices; path = ../../notices; sourceTree = SOURCE_ROOT; };
+		A00000000000000000000064 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		A71000000000000000000001 /* HALiveActivityEntityControlIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HALiveActivityEntityControlIntent.swift; sourceTree = "<group>"; };
+		A71000000000000000000002 /* LiveActivityEntityControlService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityEntityControlService.swift; sourceTree = "<group>"; };
+		P00000000000000000000001 /* HA LiveKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "HA LiveKit.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		P00000000000000000000002 /* HA LiveKitWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "HA LiveKitWidget.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F00000000000000000000002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F00000000000000000000003 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		G00000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				G00000000000000000000002 /* HA LiveKit */,
+				G00000000000000000000011 /* HA LiveKitWidget */,
+				G00000000000000000000012 /* Shared */,
+				G00000000000000000000014 /* Config */,
+				G00000000000000000000013 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		G00000000000000000000002 /* HA LiveKit */ = {
+			isa = PBXGroup;
+			children = (
+				G00000000000000000000003 /* App */,
+				G00000000000000000000004 /* Models */,
+				G00000000000000000000005 /* Services */,
+				G00000000000000000000006 /* Views */,
+				A000000000000000000000A1 /* AppIcon.icon */,
+				A00000000000000000000063 /* notices */,
+				A00000000000000000000028 /* Assets.xcassets */,
+				V00000000000000000000001 /* Localizable.strings */,
+				A00000000000000000000032 /* HA LiveKit.entitlements */,
+				A00000000000000000000023 /* Info.plist */,
+				A00000000000000000000064 /* PrivacyInfo.xcprivacy */,
+			);
+			path = "HA LiveKit";
+			sourceTree = "<group>";
+		};
+		G00000000000000000000003 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000001 /* HA_LiveKitApp.swift */,
+				A00000000000000000000002 /* AppModel.swift */,
+				A00000000000000000000003 /* AppRootView.swift */,
+				A00000000000000000000004 /* HALiveKitIntents.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		G00000000000000000000004 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000005 /* ConnectionConfiguration.swift */,
+				A00000000000000000000026 /* HALiveKitActivityRequest.swift */,
+				A00000000000000000000029 /* APNsRelaySettings.swift */,
+				A00000000000000000000034 /* ManagedRelayConfig.swift */,
+				A00000000000000000000047 /* AppPreferences.swift */,
+				A00000000000000000000052 /* HealthChecklist.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		G00000000000000000000005 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000006 /* KeychainCredentialStore.swift */,
+				A00000000000000000000007 /* HomeAssistantClient.swift */,
+				A00000000000000000000045 /* HomeAssistantConnectionResolver.swift */,
+				A00000000000000000000008 /* HomeAssistantWebSocketManager.swift */,
+				A00000000000000000000009 /* LiveActivityManager.swift */,
+				A71000000000000000000002 /* LiveActivityEntityControlService.swift */,
+				A00000000000000000000033 /* DemoHomeProvider.swift */,
+				A00000000000000000000036 /* HAEntityCacheStore.swift */,
+				A00000000000000000000030 /* APNsLiveActivityRelayClient.swift */,
+				A00000000000000000000031 /* LiveActivityRelayRegistrar.swift */,
+				A00000000000000000000048 /* AppPreferencesStore.swift */,
+				A00000000000000000000049 /* CloudKitPreferencesMirror.swift */,
+				A00000000000000000000050 /* iCloudAccountObserver.swift */,
+				A00000000000000000000061 /* AppLanguage.swift */,
+				A00000000000000000000062 /* AppUpdateService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		G00000000000000000000006 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				G00000000000000000000007 /* Components */,
+				G00000000000000000000008 /* Screens */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		G00000000000000000000007 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000010 /* DesignSystem.swift */,
+				A00000000000000000000053 /* HealthChecklistView.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		G00000000000000000000008 /* Screens */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000011 /* OnboardingView.swift */,
+				A00000000000000000000012 /* DashboardView.swift */,
+				A00000000000000000000013 /* EntityPickerView.swift */,
+				A00000000000000000000014 /* ActivityBuilderView.swift */,
+				A00000000000000000000015 /* SettingsView.swift */,
+				A00000000000000000000027 /* DiagnosticsView.swift */,
+				A00000000000000000000051 /* WhatsNewView.swift */,
+			);
+			path = Screens;
+			sourceTree = "<group>";
+		};
+		G00000000000000000000011 /* HA LiveKitWidget */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000021 /* HALiveActivityWidgetBundle.swift */,
+				A00000000000000000000022 /* HALiveActivityWidget.swift */,
+				A00000000000000000000024 /* Info.plist */,
+			);
+			path = "HA LiveKitWidget";
+			sourceTree = "<group>";
+		};
+		G00000000000000000000012 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000016 /* HALiveActivityAttributes.swift */,
+				A71000000000000000000001 /* HALiveActivityEntityControlIntent.swift */,
+				A00000000000000000000017 /* HAEntity.swift */,
+				A00000000000000000000018 /* LiveActivityTemplate.swift */,
+				A00000000000000000000035 /* EntityLiveActivityBuilder.swift */,
+				A00000000000000000000019 /* MockData.swift */,
+				A00000000000000000000020 /* HALiveActivityTheme+SwiftUI.swift */,
+				A00000000000000000000037 /* L10n.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		G00000000000000000000013 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				P00000000000000000000001 /* HA LiveKit.app */,
+				P00000000000000000000002 /* HA LiveKitWidget.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		G00000000000000000000014 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000025 /* BundleIdentifiers.xcconfig */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		T00000000000000000000001 /* HA LiveKit */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C00000000000000000000003 /* Build configuration list for PBXNativeTarget "HA LiveKit" */;
+			buildPhases = (
+				F00000000000000000000004 /* Sources */,
+				F00000000000000000000002 /* Frameworks */,
+				F00000000000000000000005 /* Resources */,
+				F00000000000000000000001 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D00000000000000000000002 /* PBXTargetDependency */,
+			);
+			name = "HA LiveKit";
+			productName = "HA LiveKit";
+			productReference = P00000000000000000000001 /* HA LiveKit.app */;
+			productType = "com.apple.product-type.application";
+		};
+		T00000000000000000000002 /* HA LiveKitWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C00000000000000000000006 /* Build configuration list for PBXNativeTarget "HA LiveKitWidget" */;
+			buildPhases = (
+				F00000000000000000000006 /* Sources */,
+				F00000000000000000000003 /* Frameworks */,
+				F00000000000000000000007 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "HA LiveKitWidget";
+			productName = "HA LiveKitWidget";
+			productReference = P00000000000000000000002 /* HA LiveKitWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E00000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 2640;
+				TargetAttributes = {
+					T00000000000000000000001 = {
+						CreatedOnToolsVersion = 15.0;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iCloud = {
+								enabled = 1;
+							};
+							com.apple.Push = {
+								enabled = 1;
+							};
+							com.apple.iCloud = {
+								enabled = 1;
+							};
+						};
+					};
+					T00000000000000000000002 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = C00000000000000000000001 /* Build configuration list for PBXProject "HA LiveKit" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				tr,
+				it,
+				de,
+				fr,
+				nl,
+				es,
+				pt,
+				cs,
+				da,
+				fi,
+				ja,
+				no,
+				pl,
+				sv,
+			);
+			mainGroup = G00000000000000000000001;
+			productRefGroup = G00000000000000000000013 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				T00000000000000000000001 /* HA LiveKit */,
+				T00000000000000000000002 /* HA LiveKitWidget */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F00000000000000000000005 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B00000000000000000000028 /* Assets.xcassets in Resources */,
+				B000000000000000000000A1 /* AppIcon.icon in Resources */,
+				B00000000000000000000038 /* Localizable.strings in Resources */,
+				B00000000000000000000050 /* notices in Resources */,
+				B00000000000000000000051 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F00000000000000000000007 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B00000000000000000000039 /* Localizable.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F00000000000000000000004 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B00000000000000000000001 /* HA_LiveKitApp.swift in Sources */,
+				B00000000000000000000002 /* AppModel.swift in Sources */,
+				B00000000000000000000003 /* AppRootView.swift in Sources */,
+				B00000000000000000000004 /* HALiveKitIntents.swift in Sources */,
+				B00000000000000000000005 /* ConnectionConfiguration.swift in Sources */,
+				B00000000000000000000006 /* KeychainCredentialStore.swift in Sources */,
+				B00000000000000000000007 /* HomeAssistantClient.swift in Sources */,
+				B00000000000000000000040 /* HomeAssistantConnectionResolver.swift in Sources */,
+				B00000000000000000000008 /* HomeAssistantWebSocketManager.swift in Sources */,
+				B00000000000000000000009 /* LiveActivityManager.swift in Sources */,
+				B00000000000000000000010 /* DesignSystem.swift in Sources */,
+				B00000000000000000000011 /* OnboardingView.swift in Sources */,
+				B00000000000000000000012 /* DashboardView.swift in Sources */,
+				B00000000000000000000013 /* EntityPickerView.swift in Sources */,
+				B00000000000000000000014 /* ActivityBuilderView.swift in Sources */,
+				B00000000000000000000015 /* SettingsView.swift in Sources */,
+				B00000000000000000000016 /* HALiveActivityAttributes.swift in Sources */,
+				B71000000000000000000001 /* HALiveActivityEntityControlIntent.swift in Sources */,
+				B71000000000000000000003 /* LiveActivityEntityControlService.swift in Sources */,
+				B00000000000000000000017 /* HAEntity.swift in Sources */,
+				B00000000000000000000018 /* LiveActivityTemplate.swift in Sources */,
+				B00000000000000000000019 /* MockData.swift in Sources */,
+				B00000000000000000000020 /* HALiveActivityTheme+SwiftUI.swift in Sources */,
+				B00000000000000000000026 /* HALiveKitActivityRequest.swift in Sources */,
+				B00000000000000000000027 /* DiagnosticsView.swift in Sources */,
+				B00000000000000000000029 /* APNsRelaySettings.swift in Sources */,
+				B00000000000000000000030 /* APNsLiveActivityRelayClient.swift in Sources */,
+				B00000000000000000000031 /* LiveActivityRelayRegistrar.swift in Sources */,
+				B00000000000000000000032 /* DemoHomeProvider.swift in Sources */,
+				B00000000000000000000033 /* ManagedRelayConfig.swift in Sources */,
+				B00000000000000000000034 /* EntityLiveActivityBuilder.swift in Sources */,
+				B00000000000000000000035 /* HAEntityCacheStore.swift in Sources */,
+				B00000000000000000000036 /* L10n.swift in Sources */,
+				B00000000000000000000041 /* AppPreferences.swift in Sources */,
+				B00000000000000000000042 /* AppPreferencesStore.swift in Sources */,
+				B00000000000000000000043 /* CloudKitPreferencesMirror.swift in Sources */,
+				B00000000000000000000044 /* iCloudAccountObserver.swift in Sources */,
+				B00000000000000000000045 /* WhatsNewView.swift in Sources */,
+				B00000000000000000000046 /* HealthChecklist.swift in Sources */,
+				B00000000000000000000047 /* HealthChecklistView.swift in Sources */,
+				B00000000000000000000048 /* AppLanguage.swift in Sources */,
+				B00000000000000000000049 /* AppUpdateService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F00000000000000000000006 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B00000000000000000000021 /* HALiveActivityWidgetBundle.swift in Sources */,
+				B00000000000000000000022 /* HALiveActivityWidget.swift in Sources */,
+				B00000000000000000000023 /* HALiveActivityAttributes.swift in Sources */,
+				B71000000000000000000002 /* HALiveActivityEntityControlIntent.swift in Sources */,
+				B00000000000000000000024 /* HALiveActivityTheme+SwiftUI.swift in Sources */,
+				B00000000000000000000037 /* L10n.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D00000000000000000000002 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = T00000000000000000000002 /* HA LiveKitWidget */;
+			targetProxy = D00000000000000000000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		V00000000000000000000001 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A00000000000000000000038 /* en */,
+				A00000000000000000000039 /* tr */,
+				A00000000000000000000040 /* it */,
+				A00000000000000000000041 /* de */,
+				A00000000000000000000042 /* fr */,
+				A00000000000000000000043 /* nl */,
+				A00000000000000000000044 /* es */,
+				A00000000000000000000046 /* pt */,
+				A00000000000000000000054 /* cs */,
+				A00000000000000000000055 /* da */,
+				A00000000000000000000056 /* fi */,
+				A00000000000000000000057 /* ja */,
+				A00000000000000000000058 /* no */,
+				A00000000000000000000059 /* pl */,
+				A00000000000000000000060 /* sv */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		C00000000000000000000002 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "$(HALIVEKIT_DEVELOPMENT_TEAM)";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		C00000000000000000000004 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A00000000000000000000025 /* BundleIdentifiers.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = "HA LiveKit/HA LiveKit.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 25;
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = "$(HALIVEKIT_DEVELOPMENT_TEAM)";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "HA LiveKit/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				HALIVEKIT_RELAY_ENVIRONMENT = sandbox;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 2.1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(HALIVEKIT_BUNDLE_ID)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		C00000000000000000000005 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "$(HALIVEKIT_DEVELOPMENT_TEAM)";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		C00000000000000000000007 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A00000000000000000000025 /* BundleIdentifiers.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = "HA LiveKit/HA LiveKit.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 25;
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = "$(HALIVEKIT_DEVELOPMENT_TEAM)";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "HA LiveKit/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				HALIVEKIT_RELAY_ENVIRONMENT = production;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 2.1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(HALIVEKIT_BUNDLE_ID)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		C00000000000000000000008 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A00000000000000000000025 /* BundleIdentifiers.xcconfig */;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 25;
+				DEVELOPMENT_TEAM = "$(HALIVEKIT_DEVELOPMENT_TEAM)";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "HA LiveKitWidget/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 2.1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(HALIVEKIT_WIDGET_BUNDLE_ID)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) HALIVEKIT_WIDGET_EXTENSION";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		C00000000000000000000009 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A00000000000000000000025 /* BundleIdentifiers.xcconfig */;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 25;
+				DEVELOPMENT_TEAM = "$(HALIVEKIT_DEVELOPMENT_TEAM)";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "HA LiveKitWidget/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 2.1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(HALIVEKIT_WIDGET_BUNDLE_ID)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) HALIVEKIT_WIDGET_EXTENSION";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C00000000000000000000001 /* Build configuration list for PBXProject "HA LiveKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C00000000000000000000002 /* Debug */,
+				C00000000000000000000005 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C00000000000000000000003 /* Build configuration list for PBXNativeTarget "HA LiveKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C00000000000000000000004 /* Debug */,
+				C00000000000000000000007 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C00000000000000000000006 /* Build configuration list for PBXNativeTarget "HA LiveKitWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C00000000000000000000008 /* Debug */,
+				C00000000000000000000009 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E00000000000000000000001 /* Project object */;
+}

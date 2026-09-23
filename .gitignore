@@ -1,14 +1,43 @@
 .DS_Store
+*.swp
+*.swo
+
+# Python / local Home Assistant state
 __pycache__/
 *.py[cod]
 .pytest_cache/
-
-# Local Home Assistant/dev state
 .storage/
 deps/
 home-assistant.log*
 
-# Secrets and private app/relay material
+# Xcode user/local state
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+.build/
+.swiftpm/
+Pods/
+Carthage/Build/
+
+# Archives and symbols
+*.xcarchive
+*.ipa
+*.dSYM
+*.dSYM.zip
+
+# Local tooling and scratch output
+.planning/
+.playwright-cli/
+.local-tools/
+graphify-out/
+output/
+
+# JavaScript tooling
+node_modules/
+.wrangler/
+
+# Secrets and private app/relay material: never commit these
 .env
 .env.*
 .dev.vars
@@ -16,14 +45,9 @@ home-assistant.log*
 *.token
 *.secret
 *.p8
+*.p12
+*.pem
+*.mobileprovision
+*.cer
 AuthKey_*.p8
 LocalSecrets.xcconfig
-
-# Keep this HACS repository integration-only
-ios/
-relay/
-scripts/
-*.xcarchive
-*.ipa
-*.dSYM
-*.dSYM.zip
