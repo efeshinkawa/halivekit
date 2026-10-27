@@ -20,10 +20,11 @@
 
 set -eu
 
-# HA LiveKit 2.1 is intentionally released with Xcode 26.5. Fail before
-# credentials are materialized or compilation starts if the server-side
-# workflow drifts to a different Xcode image.
-REQUIRED_XCODE_VERSION="26.5"
+# HA LiveKit 2.1.2+ must be built with Xcode 27.1: only the iOS 27.1 SDK lets
+# the app extend edge to edge on iPhone Duo. Fail before credentials are
+# materialized or compilation starts if the server-side workflow drifts to a
+# different Xcode image.
+REQUIRED_XCODE_VERSION="27.1"
 ACTUAL_XCODE_VERSION="$(/usr/bin/xcodebuild -version | /usr/bin/awk 'NR == 1 { print $2 }')"
 if [ "${ACTUAL_XCODE_VERSION}" != "${REQUIRED_XCODE_VERSION}" ]; then
   echo "ci_post_clone: ERROR - Xcode ${REQUIRED_XCODE_VERSION} is required; workflow selected Xcode ${ACTUAL_XCODE_VERSION}." >&2
