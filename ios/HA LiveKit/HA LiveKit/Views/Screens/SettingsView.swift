@@ -927,16 +927,17 @@ struct IntegrationGuideView: View {
         ZStack {
             PremiumBackground()
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    header
-                    steps
-                    copyActions
-                    if showsPrimaryActions {
-                        primaryActions
+                AdaptiveScreenContent {
+                    VStack(alignment: .leading, spacing: 16) {
+                        header
+                        steps
+                        copyActions
+                        if showsPrimaryActions {
+                            primaryActions
+                        }
                     }
+                    .padding(.top, 16)
                 }
-                .padding(16)
-                .padding(.bottom, 20)
             }
         }
         .navigationTitle("Set up HA LiveKit")

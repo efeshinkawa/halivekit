@@ -160,8 +160,20 @@ struct DashboardView: View {
                     message: "Pick an entity to start showing Home Assistant state on the Lock Screen."
                 )
             } else {
-                ForEach(appModel.activeActivities) { record in
-                    ActiveActivityCard(record: record)
+                // One column on a phone or folded iPhone Duo, two once the
+                // window is wide enough (Duo unfolded, phones in landscape).
+                LazyVGrid(
+                    columns: [GridItem(
+                        .adaptive(minimum: HALiveKitDesign.Layout.cardGridMinimumColumnWidth),
+                        spacing: HALiveKitDesign.Spacing.medium,
+                        alignment: .top
+                    )],
+                    alignment: .leading,
+                    spacing: HALiveKitDesign.Spacing.medium
+                ) {
+                    ForEach(appModel.activeActivities) { record in
+                        ActiveActivityCard(record: record)
+                    }
                 }
             }
         }

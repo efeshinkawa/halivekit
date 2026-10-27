@@ -160,6 +160,9 @@ private struct AppUpdateBanner: View {
                 }
             }
         }
+        // Keep the banner's text and buttons on the same column as the screen
+        // content below it instead of stretching across an unfolded iPhone Duo.
+        .frame(maxWidth: HALiveKitDesign.Layout.maximumContentWidth, alignment: .leading)
         .padding(.horizontal, HALiveKitDesign.Layout.screenInset)
         .padding(.vertical, HALiveKitDesign.Spacing.medium)
         .frame(maxWidth: .infinity)

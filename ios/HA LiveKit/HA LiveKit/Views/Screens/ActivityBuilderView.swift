@@ -23,6 +23,7 @@ struct ActivityBuilderView: View {
     @State private var isYAMLPresented = false
     @State private var showsAllPresets = false
     @State private var allowsEntityControl = false
+    @State private var containerWidth: CGFloat = 0
 
     init(primaryEntity: HAEntity, template: LiveActivityTemplate? = nil) {
         self.primaryEntity = primaryEntity
@@ -57,20 +58,22 @@ struct ActivityBuilderView: View {
     var body: some View {
         ZStack {
             PremiumBackground()
-            ScrollView {
-                AdaptiveScreenContent {
-                    VStack(alignment: .leading, spacing: HALiveKitDesign.Spacing.large) {
-                        previewCard
-                        presetCard
-                        formCard
-                        entityControlCard
-                        automationCard
-                        startButton
+            if usesTwoColumns {
+                twoColumnLayout
+            } else {
+                ScrollView {
+                    AdaptiveScreenContent {
+                        VStack(alignment: .leading, spacing: HALiveKitDesign.Spacing.large) {
+                            previewCard
+                            presetCard
+                            editingCards
+                        }
+                        .padding(.top, HALiveKitDesign.Spacing.standard)
                     }
-                    .padding(.top, HALiveKitDesign.Spacing.standard)
                 }
             }
         }
+        .onWidthChange { containerWidth = $0 }
         .navigationTitle("Live Activity")
         .navigationBarTitleDisplayMode(.inline)
         .tint(theme.accentColor)
@@ -88,6 +91,51 @@ struct ActivityBuilderView: View {
         .sheet(isPresented: $isYAMLPresented) {
             AutomationYAMLSheet(yaml: automationYAML)
         }
+    }
+
+    private var usesTwoColumns: Bool {
+        containerWidth >= HALiveKitDesign.Layout.twoColumnMinimumWidth
+    }
+
+    /// Wide windows (iPhone Duo unfolded in landscape, large iPhones in
+    /// landscape) keep the preview beside the form, so every edit stays visible
+    /// without scrolling back up. Both branches read the same @State, so a fold
+    /// mid-edit keeps the draft.
+    private var twoColumnLayout: some View {
+        HStack(alignment: .top, spacing: HALiveKitDesign.Spacing.large) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: HALiveKitDesign.Spacing.large) {
+                    previewCard
+                    presetCard
+                }
+                .padding(.vertical, HALiveKitDesign.Spacing.standard)
+            }
+            .frame(width: previewColumnWidth)
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: HALiveKitDesign.Spacing.large) {
+                    editingCards
+                }
+                .padding(.vertical, HALiveKitDesign.Spacing.standard)
+            }
+        }
+        .frame(maxWidth: 1080)
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, HALiveKitDesign.Layout.screenInset)
+    }
+
+    /// Lock Screen previews are drawn for phone widths; below 360 pt they start
+    /// truncating, above 440 pt they only add empty margins.
+    private var previewColumnWidth: CGFloat {
+        min(440, max(360, containerWidth * 0.42))
+    }
+
+    @ViewBuilder
+    private var editingCards: some View {
+        formCard
+        entityControlCard
+        automationCard
+        startButton
     }
 
     private var previewCard: some View {

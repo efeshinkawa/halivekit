@@ -22,6 +22,13 @@ enum HALiveKitDesign {
         static let screenInset: CGFloat = 16
         static let maximumContentWidth: CGFloat = 760
         static let floatingTabBarContentClearance: CGFloat = 80
+        /// Narrowest container that can hold a 360 pt preview next to a form column.
+        /// Reached on iPhone Duo's unfolded display in landscape and on large
+        /// iPhones in landscape; never on a folded or portrait phone.
+        static let twoColumnMinimumWidth: CGFloat = 760
+        /// Cards drop to one column below roughly 2 × 280 pt of content width,
+        /// so iPhone Duo's inner display gets two columns and a phone gets one.
+        static let cardGridMinimumColumnWidth: CGFloat = 280
     }
 
     enum Motion {
@@ -86,6 +93,19 @@ struct AdaptiveScreenContent<Content: View>: View {
             .frame(maxWidth: .infinity)
             .padding(.horizontal, HALiveKitDesign.Layout.screenInset)
             .padding(.bottom, HALiveKitDesign.Spacing.large)
+    }
+}
+
+extension View {
+    /// Reports the width this view is given, now and whenever it changes.
+    /// iPhone Duo resizes the window on every fold, so layout has to follow the
+    /// measured space rather than the device, idiom, or orientation.
+    func onWidthChange(_ action: @escaping (CGFloat) -> Void) -> some View {
+        onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.width
+        } action: { width in
+            action(width)
+        }
     }
 }
 
