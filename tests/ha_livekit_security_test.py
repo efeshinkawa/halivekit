@@ -1810,7 +1810,8 @@ print("URL provider boundary OK")
                 check=False,
                 capture_output=True,
                 text=True,
-                timeout=30,
+                # A cold swiftc on a hosted CI runner can take longer than 30 s.
+                timeout=180,
             )
             self.assertEqual(
                 compile_result.returncode,
