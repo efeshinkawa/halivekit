@@ -973,6 +973,8 @@ struct IntegrationGuideView: View {
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
+        // Full width so this card's edges line up with the cards below it.
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(HALiveKitDesign.Spacing.standard)
         .glassPanel()
     }
@@ -1098,7 +1100,8 @@ private struct GuideStep: View {
                 .foregroundStyle(.white)
                 .frame(width: 24, height: 24)
                 .background(HALiveActivityTheme.homeAssistant.accentColor, in: Circle())
-            Text(text)
+            // A String argument is shown verbatim, so look up the translation.
+            Text(L10n.string(text))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
