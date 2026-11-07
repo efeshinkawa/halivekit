@@ -3,6 +3,8 @@ import SwiftUI
 struct DashboardView: View {
     @Environment(AppModel.self) private var appModel
     @State private var didDismissCurrentConnectivityNotice = false
+    @State private var stacksMetrics = false
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         NavigationStack {
@@ -50,6 +52,17 @@ struct DashboardView: View {
         }
     }
 
+    /// Three equal tiles, never two plus an orphan: on narrow windows such as
+    /// iPhone Duo's outer display the tiles stack their icon above the text
+    /// instead of wrapping to a second row. Accessibility sizes get one
+    /// full-width column so the labels stay readable.
+    private var metricColumns: [GridItem] {
+        if dynamicTypeSize.isAccessibilitySize {
+            return [GridItem(.flexible())]
+        }
+        return Array(repeating: GridItem(.flexible(), spacing: HALiveKitDesign.Spacing.small), count: 3)
+    }
+
     private var connectionCard: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .top) {
@@ -71,10 +84,16 @@ struct DashboardView: View {
                 )
             }
 
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 104), spacing: HALiveKitDesign.Spacing.small)], spacing: HALiveKitDesign.Spacing.small) {
-                MiniMetric(title: "Entities", value: "\(appModel.entities.count)", iconName: "square.stack.3d.up.fill", color: .cyan)
-                MiniMetric(title: "Live", value: "\(appModel.activeActivities.count)", iconName: "livephoto", color: .green)
-                MiniMetric(title: updateMetricTitle, value: updateModeTitle, iconName: "dot.radiowaves.left.and.right", color: updateMetricColor)
+            LazyVGrid(columns: metricColumns, spacing: HALiveKitDesign.Spacing.small) {
+                MiniMetric(title: "Entities", value: "\(appModel.entities.count)", iconName: "square.stack.3d.up.fill", color: .cyan, isStacked: stacksMetrics)
+                MiniMetric(title: "Live", value: "\(appModel.activeActivities.count)", iconName: "livephoto", color: .green, isStacked: stacksMetrics)
+                MiniMetric(title: updateMetricTitle, value: updateModeTitle, iconName: "dot.radiowaves.left.and.right", color: updateMetricColor, isStacked: stacksMetrics)
+            }
+            // Decided once for the whole row, so the three tiles always share
+            // one layout and one height.
+            .onWidthChange { width in
+                let column = (width - 2 * HALiveKitDesign.Spacing.small) / 3
+                stacksMetrics = column < HALiveKitDesign.Layout.inlineMetricMinimumWidth
             }
 
             NavigationLink {
@@ -312,9 +331,13 @@ private struct MiniMetric: View {
     var value: String
     var iconName: String
     var color: Color
+    var isStacked = false
 
     var body: some View {
-        HStack(spacing: 8) {
+        let layout = isStacked
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 6))
+            : AnyLayout(HStackLayout(spacing: 8))
+        layout {
             Image(systemName: iconName)
                 .font(.caption.weight(.bold))
                 .foregroundStyle(color)

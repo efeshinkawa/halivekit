@@ -45,6 +45,9 @@ enum HALiveKitDesign {
         /// Cards drop to one column below roughly 2 × 280 pt of content width,
         /// so iPhone Duo's inner display gets two columns and a phone gets one.
         static let cardGridMinimumColumnWidth: CGFloat = 280
+        /// A metric tile shows its icon beside the text only from this width
+        /// up (padding + icon + gap + a short label); below it the icon stacks.
+        static let inlineMetricMinimumWidth: CGFloat = 120
     }
 
     enum Motion {
