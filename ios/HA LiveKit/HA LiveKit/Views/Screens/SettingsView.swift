@@ -7,6 +7,7 @@ struct SettingsView: View {
     @Environment(AppUpdateService.self) private var updateService
     @Environment(\.openURL) private var openURL
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @State private var wideActionGridWidth: CGFloat = 0
 
     @State private var baseURL = ""
     @State private var homeName = ""
@@ -77,7 +78,10 @@ struct SettingsView: View {
             if appModel.isDemoMode {
                 NoticeBanner(
                     title: "Demo Home",
-                    message: "\(appModel.entities.count) simulated entities are available. Switch to a real connection whenever you are ready.",
+                    message: L10n.format(
+                        "%lld simulated entities are available. Switch to a real connection whenever you are ready.",
+                        appModel.entities.count
+                    ),
                     tone: .info
                 )
             }
@@ -97,6 +101,7 @@ struct SettingsView: View {
                 }
                 .buttonStyle(.borderedProminent)
             }
+            .onWidthChange { wideActionGridWidth = $0 }
         }
         .padding(HALiveKitDesign.Spacing.standard)
         .glassPanel()
@@ -705,10 +710,16 @@ struct SettingsView: View {
 
     // At accessibility sizes a 112–150 pt cell cannot hold a readable label,
     // so the buttons stack in one full-width column instead of shrinking text.
+    // Two side by side only when each button gets at least 200 pt; "Connect
+    // Home Assistant" and its translations need that much on one line. Below
+    // it (every phone width, iPhone Duo's outer display) they stack full
+    // width instead of truncating.
     private var wideActionButtonColumns: [GridItem] {
-        dynamicTypeSize.isAccessibilitySize
-            ? [GridItem(.flexible())]
-            : [GridItem(.adaptive(minimum: 150), spacing: 10)]
+        let column = (wideActionGridWidth - 10) / 2
+        if dynamicTypeSize.isAccessibilitySize || column < 200 {
+            return [GridItem(.flexible())]
+        }
+        return [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)]
     }
 
     private var compactActionButtonColumns: [GridItem] {
