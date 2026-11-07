@@ -650,3 +650,4 @@
 "This Live Activity control is no longer valid." = "Deze bediening van de Liveactiviteit is niet meer geldig.";
 "Connect Home Assistant in HA LiveKit to use this control." = "Verbind Home Assistant in HA LiveKit om deze bediening te gebruiken.";
 "Home Assistant could not complete the request. Try again." = "Home Assistant kon het verzoek niet uitvoeren. Probeer het opnieuw.";
+"Refresh entities" = "Entiteiten vernieuwen";

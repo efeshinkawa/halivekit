@@ -649,3 +649,4 @@
 "This Live Activity control is no longer valid." = "Tämä Live-aktiviteetin ohjain ei ole enää voimassa.";
 "Connect Home Assistant in HA LiveKit to use this control." = "Yhdistä Home Assistant HA LiveKitissä käyttääksesi tätä ohjainta.";
 "Home Assistant could not complete the request. Try again." = "Home Assistant ei voinut suorittaa pyyntöä. Yritä uudelleen.";
+"Refresh entities" = "Päivitä entiteetit";

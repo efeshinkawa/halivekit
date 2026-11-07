@@ -649,3 +649,4 @@
 "This Live Activity control is no longer valid." = "このライブアクティビティの操作は無効になりました。";
 "Connect Home Assistant in HA LiveKit to use this control." = "この操作を使用するには、HA LiveKit で Home Assistant に接続してください。";
 "Home Assistant could not complete the request. Try again." = "Home Assistant でリクエストを完了できませんでした。もう一度お試しください。";
+"Refresh entities" = "エンティティを更新";

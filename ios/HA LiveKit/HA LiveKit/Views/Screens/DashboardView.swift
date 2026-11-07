@@ -35,7 +35,7 @@ struct DashboardView: View {
                     Button {
                         Task { await appModel.refreshEntities() }
                     } label: {
-                        Label("Refresh entities", systemImage: "arrow.clockwise")
+                        Label(L10n.string("Refresh entities"), systemImage: "arrow.clockwise")
                             .labelStyle(.iconOnly)
                     }
                 }

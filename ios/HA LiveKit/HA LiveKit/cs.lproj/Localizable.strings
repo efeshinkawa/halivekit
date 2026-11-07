@@ -649,3 +649,4 @@
 "This Live Activity control is no longer valid." = "Tento ovládací prvek Živé aktivity již není platný.";
 "Connect Home Assistant in HA LiveKit to use this control." = "Chcete-li tento ovládací prvek používat, připojte Home Assistant v HA LiveKit.";
 "Home Assistant could not complete the request. Try again." = "Home Assistant nemohl požadavek dokončit. Zkuste to znovu.";
+"Refresh entities" = "Obnovit entity";

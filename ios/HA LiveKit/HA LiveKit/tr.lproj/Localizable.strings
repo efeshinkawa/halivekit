@@ -650,3 +650,4 @@
 "This Live Activity control is no longer valid." = "Bu Canlı Etkinlik kontrolü artık geçerli değil.";
 "Connect Home Assistant in HA LiveKit to use this control." = "Bu kontrolü kullanmak için HA LiveKit’te Home Assistant’a bağlan.";
 "Home Assistant could not complete the request. Try again." = "Home Assistant isteği tamamlayamadı. Tekrar dene.";
+"Refresh entities" = "Varlıkları yenile";

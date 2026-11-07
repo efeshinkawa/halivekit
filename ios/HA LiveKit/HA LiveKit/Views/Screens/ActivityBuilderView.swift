@@ -85,7 +85,7 @@ struct ActivityBuilderView: View {
                 } label: {
                     // A titled Label lets the system show a name wherever the
                     // bar overflows into a menu; the bar itself stays icon-only.
-                    Label("Show Home Assistant YAML", systemImage: "doc.text")
+                    Label(L10n.string("Show Home Assistant YAML"), systemImage: "doc.text")
                         .labelStyle(.iconOnly)
                         .frame(width: HALiveKitDesign.Layout.minimumTapTarget, height: HALiveKitDesign.Layout.minimumTapTarget)
                 }
@@ -212,30 +212,45 @@ struct ActivityBuilderView: View {
 
     private var presetCard: some View {
         VStack(alignment: .leading, spacing: HALiveKitDesign.Spacing.medium) {
-            HStack(alignment: .top, spacing: HALiveKitDesign.Spacing.small) {
-                SectionHeader(
-                    title: "Quick Presets",
-                    subtitle: "Start from a purpose-built layout, then fine-tune any field."
-                )
+            // The toggle shares the title's line and the subtitle runs full
+            // width beneath both, so on narrow windows (iPhone Duo's outer
+            // display) the subtitle is not squeezed into a column beside it.
+            VStack(alignment: .leading, spacing: HALiveKitDesign.Spacing.xSmall) {
+                HStack(alignment: .firstTextBaseline, spacing: HALiveKitDesign.Spacing.small) {
+                    Text(L10n.string("Quick Presets"))
+                        .font(.headline)
+                        .accessibilityAddTraits(.isHeader)
 
-                Button {
-                    withAnimation(reduceMotion ? nil : HALiveKitDesign.Motion.standard) {
-                        showsAllPresets.toggle()
+                    Spacer(minLength: HALiveKitDesign.Spacing.small)
+
+                    Button {
+                        withAnimation(reduceMotion ? nil : HALiveKitDesign.Motion.standard) {
+                            showsAllPresets.toggle()
+                        }
+                    } label: {
+                        Label(
+                            L10n.string(showsAllPresets ? "Show Less" : "Show More"),
+                            systemImage: showsAllPresets ? "chevron.up" : "chevron.down"
+                        )
+                        .font(.subheadline.weight(.semibold))
+                        .lineLimit(1)
+                        // 44 pt hit area without making the title row taller.
+                        .padding(.vertical, HALiveKitDesign.Spacing.medium)
+                        .contentShape(Rectangle())
+                        .padding(.vertical, -HALiveKitDesign.Spacing.medium)
                     }
-                } label: {
-                    Label(
-                        L10n.string(showsAllPresets ? "Show Less" : "Show More"),
-                        systemImage: showsAllPresets ? "chevron.up" : "chevron.down"
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.tint)
+                    .accessibilityValue(
+                        Text(L10n.string(showsAllPresets ? "Expanded" : "Collapsed"))
                     )
-                    .font(.subheadline.weight(.semibold))
-                    .lineLimit(1)
-                    .frame(minHeight: HALiveKitDesign.Layout.minimumTapTarget)
                 }
-                .buttonStyle(.plain)
-                .foregroundStyle(.tint)
-                .accessibilityValue(
-                    Text(L10n.string(showsAllPresets ? "Expanded" : "Collapsed"))
-                )
+
+                Text(L10n.string("Start from a purpose-built layout, then fine-tune any field."))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
 
             if showsAllPresets {
