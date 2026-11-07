@@ -52,10 +52,10 @@ struct EntityPickerView: View {
                         await appModel.refreshEntities()
                     }
                 } label: {
-                    Image(systemName: "arrow.clockwise")
+                    Label("Refresh entities", systemImage: "arrow.clockwise")
+                        .labelStyle(.iconOnly)
                         .frame(width: HALiveKitDesign.Layout.minimumTapTarget, height: HALiveKitDesign.Layout.minimumTapTarget)
                 }
-                .accessibilityLabel("Refresh entities")
             }
         }
         .task {

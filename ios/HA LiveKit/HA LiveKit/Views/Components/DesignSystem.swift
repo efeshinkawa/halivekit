@@ -22,10 +22,26 @@ enum HALiveKitDesign {
         static let screenInset: CGFloat = 16
         static let maximumContentWidth: CGFloat = 760
         static let floatingTabBarContentClearance: CGFloat = 80
-        /// Narrowest container that can hold a 360 pt preview next to a form column.
+        /// Lock Screen previews are drawn for phone widths; below 360 pt they start
+        /// truncating, above 440 pt they only add empty margins.
+        static let previewColumnMinimumWidth: CGFloat = 360
+        static let previewColumnMaximumWidth: CGFloat = 440
+        /// The form holds a segmented theme picker and menu pickers that clip
+        /// below about 400 pt.
+        static let formColumnMinimumWidth: CGFloat = 400
+        /// Narrowest container that can hold the preview column, the gutter and
+        /// a form column without clipping either: 2 × 16 inset + 360 + 24 + 400.
         /// Reached on iPhone Duo's unfolded display in landscape and on large
         /// iPhones in landscape; never on a folded or portrait phone.
-        static let twoColumnMinimumWidth: CGFloat = 760
+        static let twoColumnMinimumWidth: CGFloat =
+            2 * screenInset + previewColumnMinimumWidth + Spacing.large + formColumnMinimumWidth
+        /// Below this height a pinned preview would leave the presets under it
+        /// almost no room, so the whole left column scrolls instead (phones in
+        /// landscape).
+        static let pinnedPreviewMinimumHeight: CGFloat = 600
+        /// Shared cap for focused, single-purpose flows (onboarding, What's New),
+        /// so every narrow screen lines up on the same leading edge.
+        static let narrowContentWidth: CGFloat = 560
         /// Cards drop to one column below roughly 2 × 280 pt of content width,
         /// so iPhone Duo's inner display gets two columns and a phone gets one.
         static let cardGridMinimumColumnWidth: CGFloat = 280
@@ -105,6 +121,15 @@ extension View {
             proxy.size.width
         } action: { width in
             action(width)
+        }
+    }
+
+    /// Same as `onWidthChange`, for layouts that also depend on the height.
+    func onSizeChange(_ action: @escaping (CGSize) -> Void) -> some View {
+        onGeometryChange(for: CGSize.self) { proxy in
+            proxy.size
+        } action: { size in
+            action(size)
         }
     }
 }

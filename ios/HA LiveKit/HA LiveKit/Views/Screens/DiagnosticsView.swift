@@ -521,16 +521,17 @@ private struct DebugLogsView: View {
                     UIPasteboard.general.string = appModel.redactedDebugLogsText
                     didCopy = true
                 } label: {
-                    Image(systemName: didCopy ? "checkmark.circle.fill" : "doc.on.doc")
-                        .frame(
-                            width: HALiveKitDesign.Layout.minimumTapTarget,
-                            height: HALiveKitDesign.Layout.minimumTapTarget
-                        )
+                    Label(
+                        L10n.string(didCopy ? "Copied" : "Copy redacted logs"),
+                        systemImage: didCopy ? "checkmark.circle.fill" : "doc.on.doc"
+                    )
+                    .labelStyle(.iconOnly)
+                    .frame(
+                        width: HALiveKitDesign.Layout.minimumTapTarget,
+                        height: HALiveKitDesign.Layout.minimumTapTarget
+                    )
                 }
                 .disabled(entries.isEmpty)
-                .accessibilityLabel(
-                    Text(L10n.string(didCopy ? "Copied" : "Copy redacted logs"))
-                )
             }
         }
     }

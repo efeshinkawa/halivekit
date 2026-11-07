@@ -10,17 +10,20 @@ struct WhatsNewView: View {
         ZStack {
             PremiumBackground()
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: HALiveKitDesign.Spacing.large) {
                     header
                     highlights
                     importantNoticesCard
                     privacyNote
                     actions
                 }
-                .padding(20)
-                .padding(.bottom, 24)
-                .frame(maxWidth: 560)
+                // Cap first, then inset: the text column is exactly as wide as
+                // onboarding's, so both focused flows share one leading edge.
+                .frame(maxWidth: HALiveKitDesign.Layout.narrowContentWidth)
                 .frame(maxWidth: .infinity)
+                .padding(.horizontal, HALiveKitDesign.Layout.screenInset)
+                .padding(.top, HALiveKitDesign.Spacing.large)
+                .padding(.bottom, HALiveKitDesign.Spacing.xLarge)
             }
         }
         .tint(HALiveActivityTheme.homeAssistant.accentColor)
@@ -33,7 +36,7 @@ struct WhatsNewView: View {
                     .font(.system(size: 34, weight: .semibold))
                     .foregroundStyle(HALiveActivityTheme.homeAssistant.gradient)
                     .frame(width: 58, height: 58)
-                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: HALiveKitDesign.Radius.control, style: .continuous))
 
                 VStack(alignment: .leading, spacing: 6) {
                     Text(L10n.format("What's new in %@", version))
@@ -119,7 +122,7 @@ struct WhatsNewView: View {
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(HALiveActivityTheme.homeAssistant.gradient)
                 .frame(width: 38, height: 38)
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: HALiveKitDesign.Radius.control, style: .continuous))
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(L10n.string(title))

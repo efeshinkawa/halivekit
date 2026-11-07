@@ -6,6 +6,7 @@ struct SettingsView: View {
     @Environment(AppModel.self) private var appModel
     @Environment(AppUpdateService.self) private var updateService
     @Environment(\.openURL) private var openURL
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     @State private var baseURL = ""
     @State private var homeName = ""
@@ -702,12 +703,18 @@ struct SettingsView: View {
         }
     }
 
+    // At accessibility sizes a 112–150 pt cell cannot hold a readable label,
+    // so the buttons stack in one full-width column instead of shrinking text.
     private var wideActionButtonColumns: [GridItem] {
-        [GridItem(.adaptive(minimum: 150), spacing: 10)]
+        dynamicTypeSize.isAccessibilitySize
+            ? [GridItem(.flexible())]
+            : [GridItem(.adaptive(minimum: 150), spacing: 10)]
     }
 
     private var compactActionButtonColumns: [GridItem] {
-        [GridItem(.adaptive(minimum: 112), spacing: 10)]
+        dynamicTypeSize.isAccessibilitySize
+            ? [GridItem(.flexible())]
+            : [GridItem(.adaptive(minimum: 112), spacing: 10)]
     }
 
     private var canTestConnection: Bool {
@@ -1103,6 +1110,8 @@ private struct GuideStep: View {
 }
 
 private struct SettingsButtonLabel: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     var title: String
     var systemImage: String
 
@@ -1118,8 +1127,9 @@ private struct SettingsButtonLabel: View {
             Image(systemName: systemImage)
         }
             .font(.subheadline.weight(.semibold))
-            .lineLimit(1)
-            .minimumScaleFactor(0.75)
+            .lineLimit(dynamicTypeSize.isAccessibilitySize ? 3 : 1)
+            .minimumScaleFactor(dynamicTypeSize.isAccessibilitySize ? 1 : 0.75)
+            .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity, minHeight: HALiveKitDesign.Layout.minimumTapTarget)
             .contentShape(Rectangle())
     }

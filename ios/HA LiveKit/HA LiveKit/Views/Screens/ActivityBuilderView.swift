@@ -23,7 +23,7 @@ struct ActivityBuilderView: View {
     @State private var isYAMLPresented = false
     @State private var showsAllPresets = false
     @State private var allowsEntityControl = false
-    @State private var containerWidth: CGFloat = 0
+    @State private var containerSize: CGSize = .zero
 
     init(primaryEntity: HAEntity, template: LiveActivityTemplate? = nil) {
         self.primaryEntity = primaryEntity
@@ -71,9 +71,10 @@ struct ActivityBuilderView: View {
                         .padding(.top, HALiveKitDesign.Spacing.standard)
                     }
                 }
+                .scrollDismissesKeyboard(.interactively)
             }
         }
-        .onWidthChange { containerWidth = $0 }
+        .onSizeChange { containerSize = $0 }
         .navigationTitle("Live Activity")
         .navigationBarTitleDisplayMode(.inline)
         .tint(theme.accentColor)
@@ -82,10 +83,12 @@ struct ActivityBuilderView: View {
                 Button {
                     isYAMLPresented = true
                 } label: {
-                    Image(systemName: "doc.text")
+                    // A titled Label lets the system show a name wherever the
+                    // bar overflows into a menu; the bar itself stays icon-only.
+                    Label("Show Home Assistant YAML", systemImage: "doc.text")
+                        .labelStyle(.iconOnly)
                         .frame(width: HALiveKitDesign.Layout.minimumTapTarget, height: HALiveKitDesign.Layout.minimumTapTarget)
                 }
-                .accessibilityLabel("Show Home Assistant YAML")
             }
         }
         .sheet(isPresented: $isYAMLPresented) {
@@ -94,7 +97,12 @@ struct ActivityBuilderView: View {
     }
 
     private var usesTwoColumns: Bool {
-        containerWidth >= HALiveKitDesign.Layout.twoColumnMinimumWidth
+        containerSize.width >= HALiveKitDesign.Layout.twoColumnMinimumWidth
+    }
+
+    /// Tall enough to keep the preview fixed while only the presets scroll.
+    private var pinsPreview: Bool {
+        containerSize.height >= HALiveKitDesign.Layout.pinnedPreviewMinimumHeight
     }
 
     /// Wide windows (iPhone Duo unfolded in landscape, large iPhones in
@@ -103,14 +111,8 @@ struct ActivityBuilderView: View {
     /// mid-edit keeps the draft.
     private var twoColumnLayout: some View {
         HStack(alignment: .top, spacing: HALiveKitDesign.Spacing.large) {
-            ScrollView {
-                VStack(alignment: .leading, spacing: HALiveKitDesign.Spacing.large) {
-                    previewCard
-                    presetCard
-                }
-                .padding(.vertical, HALiveKitDesign.Spacing.standard)
-            }
-            .frame(width: previewColumnWidth)
+            previewColumn
+                .frame(width: previewColumnWidth)
 
             ScrollView {
                 VStack(alignment: .leading, spacing: HALiveKitDesign.Spacing.large) {
@@ -118,16 +120,47 @@ struct ActivityBuilderView: View {
                 }
                 .padding(.vertical, HALiveKitDesign.Spacing.standard)
             }
+            .scrollDismissesKeyboard(.interactively)
         }
         .frame(maxWidth: 1080)
         .frame(maxWidth: .infinity)
         .padding(.horizontal, HALiveKitDesign.Layout.screenInset)
     }
 
-    /// Lock Screen previews are drawn for phone widths; below 360 pt they start
-    /// truncating, above 440 pt they only add empty margins.
+    /// When there is height to spare the preview stays put and only the presets
+    /// below it scroll, so the preview is always beside the field being edited.
+    /// On short windows (phones in landscape) the whole column scrolls, because
+    /// a pinned preview would squeeze the presets to a sliver.
+    @ViewBuilder
+    private var previewColumn: some View {
+        if pinsPreview {
+            VStack(alignment: .leading, spacing: HALiveKitDesign.Spacing.large) {
+                previewCard
+                    .padding(.top, HALiveKitDesign.Spacing.standard)
+                ScrollView {
+                    presetCard
+                        .padding(.bottom, HALiveKitDesign.Spacing.standard)
+                }
+            }
+        } else {
+            ScrollView {
+                VStack(alignment: .leading, spacing: HALiveKitDesign.Spacing.large) {
+                    previewCard
+                    presetCard
+                }
+                .padding(.vertical, HALiveKitDesign.Spacing.standard)
+            }
+        }
+    }
+
+    /// The preview takes about 42 % of the width, held between the widths the
+    /// Lock Screen preview is drawn for. The form always keeps at least
+    /// `formColumnMinimumWidth`, which `twoColumnMinimumWidth` guarantees.
     private var previewColumnWidth: CGFloat {
-        min(440, max(360, containerWidth * 0.42))
+        min(
+            HALiveKitDesign.Layout.previewColumnMaximumWidth,
+            max(HALiveKitDesign.Layout.previewColumnMinimumWidth, containerSize.width * 0.42)
+        )
     }
 
     @ViewBuilder
@@ -975,8 +1008,15 @@ private struct ActivityBuilderEntityPickerSheet: View {
                         }
                     }
                 }
-                .padding(16)
+                .padding(.top, HALiveKitDesign.Spacing.standard)
+                // Same readable column as every other list, so rows do not run
+                // edge to edge on iPhone Duo's unfolded display.
+                .frame(maxWidth: HALiveKitDesign.Layout.maximumContentWidth)
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, HALiveKitDesign.Layout.screenInset)
+                .padding(.bottom, HALiveKitDesign.Spacing.standard)
             }
+            .scrollDismissesKeyboard(.interactively)
         }
         .navigationTitle("Secondary Entity")
         .navigationBarTitleDisplayMode(.inline)

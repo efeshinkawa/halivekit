@@ -23,7 +23,7 @@ struct OnboardingView: View {
                         connectionForm
                         privacyNote
                     }
-                    .frame(maxWidth: 560)
+                    .frame(maxWidth: HALiveKitDesign.Layout.narrowContentWidth)
                     .padding(.top, HALiveKitDesign.Spacing.standard)
                 }
             }
