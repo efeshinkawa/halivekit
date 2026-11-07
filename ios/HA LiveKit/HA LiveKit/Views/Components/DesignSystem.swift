@@ -312,10 +312,16 @@ private struct HALiveKitSurfaceModifier: ViewModifier {
 }
 
 extension Date {
+    /// "5 min. ago", or "now" for something that just happened. A timestamp a
+    /// fraction of a second ahead of the clock (a fresh update) used to read
+    /// "in 0 sec."; it is clamped to the present and the named style turns
+    /// zero into the word for "now" in every language.
     var relativeShort: String {
+        let reference = Date.now
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .abbreviated
-        return formatter.localizedString(for: self, relativeTo: .now)
+        formatter.dateTimeStyle = .named
+        return formatter.localizedString(for: min(self, reference), relativeTo: reference)
     }
 }
 
